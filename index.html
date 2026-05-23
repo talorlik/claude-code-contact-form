@@ -1,1 +1,122 @@
-<!-- Placeholder. Populated in Batch 02. -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A beginner-friendly contact form with client-side validation using HTML, CSS, and JavaScript."
+    />
+    <title>Contact Us | Contact Form</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="contact-card" aria-labelledby="contactHeading">
+        <h1 id="contactHeading">Contact Us</h1>
+        <p class="contact-intro">
+          Fill in the form below to get in touch. All fields are required.
+          Your input is validated as you go and never leaves your browser.
+        </p>
+
+        <form id="contactForm" class="contact-form" novalidate>
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              class="form-input"
+              placeholder="Taylor Smith"
+              autocomplete="name"
+              aria-describedby="fullNameError"
+              aria-invalid="false"
+              required
+            />
+            <span
+              id="fullNameError"
+              class="error-message"
+              role="alert"
+              aria-live="polite"
+            ></span>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="taylor@example.com"
+              autocomplete="email"
+              aria-describedby="emailError"
+              aria-invalid="false"
+              required
+            />
+            <span
+              id="emailError"
+              class="error-message"
+              role="alert"
+              aria-live="polite"
+            ></span>
+          </div>
+
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-input"
+              placeholder="+972541234567"
+              autocomplete="tel"
+              aria-describedby="phoneError"
+              aria-invalid="false"
+              required
+            />
+            <span
+              id="phoneError"
+              class="error-message"
+              role="alert"
+              aria-live="polite"
+            ></span>
+          </div>
+
+          <div class="form-group">
+            <label for="message" class="form-label">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              class="form-input form-textarea"
+              rows="5"
+              placeholder="I would like more information."
+              aria-describedby="messageError"
+              aria-invalid="false"
+              required
+            ></textarea>
+            <span
+              id="messageError"
+              class="error-message"
+              role="alert"
+              aria-live="polite"
+            ></span>
+          </div>
+
+          <button type="submit" class="submit-button">Submit</button>
+        </form>
+
+        <div
+          id="successMessage"
+          class="success-message"
+          role="status"
+          aria-live="polite"
+        >
+          Thanks! Your message has been received.
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="javascript/main.js"></script>
+  </body>
+</html>
