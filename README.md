@@ -35,13 +35,16 @@ Add screenshots to the `images/` folder when the form is implemented:
 ## Features
 
 - Contact form with Full Name, Email, Phone, and Message fields.
+- Searchable country-code picker next to the phone field (flag, name,
+  ISO code, dial code). Defaults to Israel (`+972`).
 - Required-field validation for every input.
 - Field-specific red error messages.
 - Red borders for invalid fields and green borders for valid fields.
 - Green success message with a short fade-in animation.
 - Submit button disabled briefly while the form is submitting.
 - Alert showing the submitted data for assignment testing.
-- Form clearing after successful submission.
+- Form clearing after successful submission (the country picker resets
+  back to its default).
 - Success message hidden automatically after 3 seconds.
 
 ## Project Structure
@@ -50,6 +53,8 @@ The planned project structure is:
 
 ```text
 claude-code-contact-form/
+  data/
+    countries.json
   docs/
     assignment/
       ASSIGNMENT.md
@@ -66,10 +71,13 @@ claude-code-contact-form/
   css/
     styles.css
   javascript/
-    validation.js
+    countries.js
+    countryPicker.js
     main.js
+    validation.js
   tests/
     unit/
+      countries.test.js
       validation.test.js
     integration/
       form.integration.test.js
@@ -112,14 +120,27 @@ Then open the local URL shown in the terminal.
 | --- | --- | --- |
 | Full Name | Required, 2-30 characters, English or Hebrew letters, spaces, dots, and hyphens only. Regex: `^[a-zA-Zא-ת .-]+$` | `Taylor Smith` |
 | Email | Required and must use a valid email format. Regex: `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$` | `taylor@example.com` |
-| Phone | Required, 8-15 characters, optional leading `+`, then digits starting with `1-9`. Regex: `^\+?[1-9]\d{1,14}$` | `+972541234567` |
+| Phone | Required. Submitted as `+<dialCode> <nationalNumber>`. The dial code comes from the country picker; the user types only the national number into the input. A single leading `0` is stripped automatically. Regex (applied to the concatenated value): `^\+[1-9]\d{0,3} [1-9]\d{3,13}$` | National input: `0541234567` (or `541234567`). Submitted phone: `+972 541234567` |
 | Message | Required and at least 10 characters after trimming whitespace. | `I would like more information.` |
 
 > [!NOTE]
-> The phone rule follows the assignment's Step 3 requirement. Because the
-> regex starts with `[1-9]`, local numbers starting with `0`, such as
-> `0541234567`, are treated as invalid. Use an international-style value such
-> as `+972541234567` for valid testing.
+> The phone field now consists of a country-code picker plus a national-
+> number input. The picker defaults to Israel (`+972`); you can pick any
+> other country by clicking the trigger and either typing the country
+> name (`Israel`), the ISO 2/3 code (`IL`, `ISR`), or the dial code
+> (`+972` or `972`) into the search box. A single leading `0` in the
+> national input (e.g., `0541234567`) is stripped before validation and
+> submission, so the submitted value remains `+972 541234567`. Typing
+> two or more leading zeros (`00...`) is left as-is and will fail
+> validation.
+
+> [!NOTE]
+> Country flags are rendered as Unicode regional-indicator emoji. On
+> macOS, iOS, Android, and most Linux distributions these display as
+> small flag glyphs. On Windows (Chrome/Edge), the bundled Segoe UI
+> Emoji font does not include flag glyphs, so flags fall back to the
+> two-letter country code in a box. The picker remains fully functional;
+> only the visual is degraded.
 
 ## UX Behavior
 
@@ -163,21 +184,27 @@ npm run test:e2e
 
 ## Manual Test Data
 
-Use these values for a successful manual test:
+Use these values for a successful manual test (leave the country picker on
+its `🇮🇱 +972` default):
 
 | Field | Value |
 | --- | --- |
 | Full Name | `Taylor Smith` |
 | Email | `taylor@example.com` |
-| Phone | `+972541234567` |
+| Phone (national input) | `0541234567` (or `541234567`) |
 | Message | `I would like more information.` |
+
+The submitted-data alert will show `Phone: +972 541234567` — the picker
+contributes the dial code and the leading `0` is stripped automatically.
 
 Use these values to confirm validation errors:
 
 - Empty Full Name.
 - Email without `@`.
-- Phone with letters, such as `054abc4567`.
-- Phone that is too short, such as `1234567`.
+- Phone with letters in the national input, such as `054abc4567`.
+- Phone national input too short, such as `123`.
+- Phone with two leading zeros, such as `00541234567` (one `0` is
+  stripped, leaving a value that fails the regex).
 - Message shorter than 10 characters.
 
 ## What I Learned
@@ -200,8 +227,10 @@ be checked for an empty value after trimming whitespace.
 
 **Which validation rule was hardest to test?**
 
-The phone validation was the hardest because it combines length rules, an
-optional leading `+`, and a regex that rejects local numbers starting with `0`.
+The phone validation was the hardest because it combines length rules, a
+mandatory leading `+`, a country-picker-supplied dial code, automatic
+stripping of a single leading `0` from the national portion, and a regex
+that rejects national numbers starting with `0`.
 
 **How did Claude Code help you move from one version to the next?**
 

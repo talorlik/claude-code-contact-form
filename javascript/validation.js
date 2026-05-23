@@ -33,12 +33,21 @@
 // them and so the regexes are compiled once.
 export const NAME_REGEX = /^[a-zA-Zא-ת .-]+$/;
 export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-export const PHONE_REGEX = /^\+?[1-9]\d{1,14}$/;
+
+// Phone format: "+<dialCode> <nationalNumber>".
+//   - dialCode: 1-4 digits, first digit 1-9 (no leading 0).
+//   - single space separator.
+//   - nationalNumber: 4-14 digits, first digit 1-9 (caller is expected to
+//     strip a single leading 0 BEFORE validating; see stripLeadingZero).
+// Total digit count stays within the E.164 max of 15 (4 + 11 = 15 in the
+// extreme case).
+export const PHONE_REGEX = /^\+[1-9]\d{0,3} [1-9]\d{3,13}$/;
 
 export const NAME_MIN = 2;
 export const NAME_MAX = 30;
-export const PHONE_MIN = 8;
-export const PHONE_MAX = 15;
+// Min: "+1 1234" = 7 chars. Max: "+1234 12345678901" = 17 chars.
+export const PHONE_MIN = 7;
+export const PHONE_MAX = 17;
 export const MESSAGE_MIN = 10;
 
 const ok = () => ({ isValid: true, message: "" });
@@ -92,12 +101,13 @@ export function validateEmail(value) {
 }
 
 /**
- * Validates a phone number in E.164-style international format.
+ * Validates a phone number in the form `+<dialCode> <nationalNumber>`.
  *
- * Trims whitespace, requires a non-empty value of 8-15 characters, and
- * requires the value to match `/^\+?[1-9]\d{1,14}$/`. This explicitly rejects
- * spaces, letters, and local numbers that start with `0` (use the country
- * code instead).
+ * Trims whitespace, requires a non-empty value of 7-17 characters, and
+ * requires the value to match `PHONE_REGEX`. Callers that present a
+ * separate country picker and national-number input should strip a single
+ * leading 0 from the national portion (see `stripLeadingZero`) before
+ * concatenating and passing the result here.
  *
  * @param {string} value - Raw phone input value.
  * @returns {ValidationResult}
@@ -114,10 +124,26 @@ export function validatePhone(value) {
   }
   if (!PHONE_REGEX.test(trimmed)) {
     return fail(
-      "Phone must contain digits only, an optional leading +, and must not start with 0."
+      "Phone must be in the form +<code> <number>, digits only, and must not start with 0."
     );
   }
   return ok();
+}
+
+/**
+ * Removes exactly one leading `0` from the input, if present.
+ *
+ * Used by the form's national-number handler to normalize a habit (typing
+ * `0541234567` instead of `541234567`) before concatenating with the
+ * selected country's dial code. Removing only one zero means `00...` still
+ * fails validation, which is the intended behavior.
+ *
+ * @param {string} value
+ * @returns {string}
+ */
+export function stripLeadingZero(value) {
+  const s = String(value ?? "");
+  return s.startsWith("0") ? s.slice(1) : s;
 }
 
 /**

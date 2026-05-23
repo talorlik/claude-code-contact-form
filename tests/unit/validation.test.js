@@ -5,6 +5,7 @@ import {
   validatePhone,
   validateMessage,
   validateFormData,
+  stripLeadingZero,
 } from "../../javascript/validation.js";
 
 describe("validateFullName", () => {
@@ -103,20 +104,24 @@ describe("validateEmail", () => {
 });
 
 describe("validatePhone", () => {
-  it("accepts the minimum-length numeric value (8 digits)", () => {
-    expect(validatePhone("12345678").isValid).toBe(true);
+  it("accepts a typical international value with dial code and national number", () => {
+    expect(validatePhone("+972 541234567")).toEqual({
+      isValid: true,
+      message: "",
+    });
   });
 
-  it("accepts an international-style value with a leading +", () => {
-    expect(validatePhone("+972541234567").isValid).toBe(true);
+  it("accepts a short national number with a 1-digit dial code", () => {
+    expect(validatePhone("+1 1234567").isValid).toBe(true);
   });
 
-  it("accepts an international-style value without the leading +", () => {
-    expect(validatePhone("972541234567").isValid).toBe(true);
+  it("accepts a long national number with a 4-digit dial code", () => {
+    // Max 15 total digits per E.164 (4 in dial code + 11 in national portion).
+    expect(validatePhone("+1234 12345678901").isValid).toBe(true);
   });
 
   it("trims surrounding whitespace before validating", () => {
-    expect(validatePhone("  +972541234567  ").isValid).toBe(true);
+    expect(validatePhone("  +972 541234567  ").isValid).toBe(true);
   });
 
   it("rejects an empty value", () => {
@@ -125,33 +130,72 @@ describe("validatePhone", () => {
     expect(result.message).toMatch(/required/i);
   });
 
+  it("rejects a value missing the leading +", () => {
+    expect(validatePhone("972 541234567").isValid).toBe(false);
+  });
+
+  it("rejects a value missing the space between dial code and national number", () => {
+    expect(validatePhone("+972541234567").isValid).toBe(false);
+  });
+
+  it("rejects a value missing the national number", () => {
+    expect(validatePhone("+972 ").isValid).toBe(false);
+  });
+
   it("rejects values containing letters", () => {
-    expect(validatePhone("054abc4567").isValid).toBe(false);
+    expect(validatePhone("+972 054abc4567").isValid).toBe(false);
   });
 
-  it("rejects values containing unsupported symbols", () => {
-    expect(validatePhone("+972-541-234567").isValid).toBe(false);
+  it("rejects values with extra internal spaces", () => {
+    expect(validatePhone("+972 541 234567").isValid).toBe(false);
   });
 
-  it("rejects values with internal spaces", () => {
-    expect(validatePhone("972 541 234567").isValid).toBe(false);
+  it("rejects national numbers starting with 0", () => {
+    // The caller is expected to strip a single leading 0 BEFORE
+    // concatenation. A 0 reaching validation means the user typed at
+    // least two leading zeros, which is not a real phone-number pattern.
+    expect(validatePhone("+972 0541234567").isValid).toBe(false);
   });
 
-  it("rejects local numbers starting with 0", () => {
-    // Spec explicitly forbids this since the regex starts with [1-9].
-    expect(validatePhone("0541234567").isValid).toBe(false);
+  it("rejects national numbers shorter than 4 digits", () => {
+    expect(validatePhone("+1 123").isValid).toBe(false);
   });
 
-  it("rejects a misplaced + (not at start)", () => {
-    expect(validatePhone("972+541234567").isValid).toBe(false);
+  it("rejects national numbers longer than 14 digits", () => {
+    expect(validatePhone("+1 123456789012345").isValid).toBe(false);
   });
 
-  it("rejects values shorter than 8 characters", () => {
-    expect(validatePhone("1234567").isValid).toBe(false);
+  it("rejects a dial code with a leading 0", () => {
+    expect(validatePhone("+0 1234567").isValid).toBe(false);
+  });
+});
+
+describe("stripLeadingZero", () => {
+  it("removes a single leading 0", () => {
+    expect(stripLeadingZero("0541234567")).toBe("541234567");
   });
 
-  it("rejects values longer than 15 characters", () => {
-    expect(validatePhone("+9725412345678901").isValid).toBe(false);
+  it("leaves a value without a leading 0 unchanged", () => {
+    expect(stripLeadingZero("541234567")).toBe("541234567");
+  });
+
+  it("removes exactly one 0 — two leading zeros become one", () => {
+    // The user typed something unusual; we want validation to flag this,
+    // not silently strip both zeros and accept it.
+    expect(stripLeadingZero("00541234567")).toBe("0541234567");
+  });
+
+  it("returns an empty string unchanged", () => {
+    expect(stripLeadingZero("")).toBe("");
+  });
+
+  it("returns a single 0 as an empty string", () => {
+    expect(stripLeadingZero("0")).toBe("");
+  });
+
+  it("treats null/undefined as empty string", () => {
+    expect(stripLeadingZero(null)).toBe("");
+    expect(stripLeadingZero(undefined)).toBe("");
   });
 });
 
@@ -187,7 +231,7 @@ describe("validateFormData", () => {
     const result = validateFormData({
       fullName: "Taylor Smith",
       email: "taylor@example.com",
-      phone: "+972541234567",
+      phone: "+972 541234567",
       message: "I would like more information.",
     });
     expect(Object.keys(result).sort()).toEqual(
@@ -199,7 +243,7 @@ describe("validateFormData", () => {
     const result = validateFormData({
       fullName: "Taylor Smith",
       email: "taylor@example.com",
-      phone: "+972541234567",
+      phone: "+972 541234567",
       message: "I would like more information.",
     });
     expect(result.fullName.isValid).toBe(true);
@@ -225,7 +269,7 @@ describe("validateFormData", () => {
     const result = validateFormData({
       fullName: "Taylor Smith",
       email: "broken",
-      phone: "+972541234567",
+      phone: "+972 541234567",
       message: "short",
     });
     expect(result.fullName.isValid).toBe(true);

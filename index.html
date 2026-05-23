@@ -63,18 +63,41 @@
           </div>
 
           <div class="form-group">
-            <label for="phone" class="form-label">Phone</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              class="form-input"
-              placeholder="+972541234567"
-              autocomplete="tel"
-              aria-describedby="phoneError"
-              aria-invalid="false"
-              required
-            />
+            <label for="nationalNumber" class="form-label">Phone</label>
+            <div class="phone-input-group">
+              <button
+                type="button"
+                id="countryTrigger"
+                class="country-trigger"
+                aria-label="Country code"
+              ></button>
+              <input
+                type="tel"
+                id="nationalNumber"
+                class="form-input phone-national-input"
+                placeholder="541234567"
+                autocomplete="tel-national"
+                aria-describedby="phoneError"
+                aria-invalid="false"
+                required
+              />
+              <input type="hidden" id="phone" name="phone" />
+              <div
+                id="countryPopover"
+                class="country-popover"
+                hidden
+              >
+                <input
+                  type="search"
+                  id="countrySearch"
+                  class="country-search"
+                  placeholder="Search country or code"
+                  aria-label="Search country or code"
+                  autocomplete="off"
+                />
+                <ul id="countryList" class="country-list" role="listbox"></ul>
+              </div>
+            </div>
             <span
               id="phoneError"
               class="error-message"

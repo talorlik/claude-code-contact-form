@@ -9,6 +9,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const INDEX_HTML_PATH = resolve(__dirname, "../../index.html");
 
+// Compact country fixture covering the cases the tests exercise. Real
+// world-countries data is far larger; we don't need it here.
+const COUNTRY_FIXTURE = [
+  { name: "Canada", iso2: "CA", iso3: "CAN", dialCode: "+1", flag: "🇨🇦" },
+  { name: "Israel", iso2: "IL", iso3: "ISR", dialCode: "+972", flag: "🇮🇱" },
+  { name: "United Kingdom", iso2: "GB", iso3: "GBR", dialCode: "+44", flag: "🇬🇧" },
+  { name: "United States", iso2: "US", iso3: "USA", dialCode: "+1", flag: "🇺🇸" },
+];
+
 /**
  * Loads index.html into the jsdom document for the current test, then
  * dynamically imports main.js so its module-scope DOM lookups bind to the
@@ -17,27 +26,33 @@ const INDEX_HTML_PATH = resolve(__dirname, "../../index.html");
  */
 async function setupForm() {
   const html = readFileSync(INDEX_HTML_PATH, "utf8");
-  // Use the parsed document to swap body and head contents.
   const parser = new DOMParser();
   const parsed = parser.parseFromString(html, "text/html");
   document.documentElement.innerHTML = parsed.documentElement.innerHTML;
 
   vi.resetModules();
-  // Import after the DOM is in place so module-scope lookups find elements.
   const mod = await import("../../javascript/main.js");
+  // Let the picker-boot promise resolve (loadCountries -> picker init).
+  await new Promise((r) => setTimeout(r, 0));
+  await new Promise((r) => setTimeout(r, 0));
   return mod;
 }
 
+const VALID_NATIONAL = "541234567";
+// With default IL (+972) selected and `541234567` typed, the hidden #phone
+// carries the concatenated form that getFormData/the alert use.
+const VALID_PHONE_SUBMITTED = "+972 541234567";
 const VALID_VALUES = {
   fullName: "Taylor Smith",
   email: "taylor@example.com",
-  phone: "+972541234567",
   message: "I would like more information.",
 };
 
 function setField(name, value) {
   const el = document.getElementById(name);
   el.value = value;
+  // Some handlers (national-number recompute) listen for 'input'.
+  el.dispatchEvent(new Event("input"));
   return el;
 }
 
@@ -52,15 +67,107 @@ function submitForm() {
 }
 
 let alertSpy;
+let fetchSpy;
 
 beforeEach(() => {
   alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
-  vi.useFakeTimers();
+  // Stub fetch so the country-loader resolves to a known fixture without
+  // hitting the filesystem from jsdom.
+  fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => COUNTRY_FIXTURE,
+  });
 });
 
 afterEach(() => {
-  vi.useRealTimers();
+  // Tests that opt into fake timers must call vi.useRealTimers themselves;
+  // this is a safety net in case one forgets.
+  if (vi.isFakeTimers()) vi.useRealTimers();
   alertSpy.mockRestore();
+  fetchSpy.mockRestore();
+});
+
+describe("country picker boot", () => {
+  it("paints the default selected country (Israel) into the trigger", async () => {
+    await setupForm();
+    const trigger = document.getElementById("countryTrigger");
+    expect(trigger.textContent).toContain("🇮🇱");
+    expect(trigger.textContent).toContain("+972");
+    expect(trigger.getAttribute("aria-label")).toMatch(/Israel/);
+  });
+
+  it("seeds the hidden #phone with the default dial code", async () => {
+    await setupForm();
+    const hidden = document.getElementById("phone");
+    expect(hidden.value).toBe("+972 ");
+  });
+
+  it("opens the popover on trigger click and focuses the search input", async () => {
+    await setupForm();
+    document.getElementById("countryTrigger").dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    const popover = document.getElementById("countryPopover");
+    expect(popover.hidden).toBe(false);
+    // queueMicrotask defers focus; let it run.
+    await Promise.resolve();
+    expect(document.activeElement?.id).toBe("countrySearch");
+  });
+
+  it("filters the list as the user types in the search input", async () => {
+    await setupForm();
+    document.getElementById("countryTrigger").dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    const search = document.getElementById("countrySearch");
+    search.value = "IL";
+    search.dispatchEvent(new Event("input"));
+    const list = document.getElementById("countryList");
+    const options = list.querySelectorAll('[role="option"]');
+    expect(options.length).toBeGreaterThan(0);
+    expect(options[0].getAttribute("data-iso2")).toBe("IL");
+  });
+
+  it("selects a country on click and updates the trigger + hidden phone", async () => {
+    await setupForm();
+    setField("nationalNumber", "1234567");
+    document.getElementById("countryTrigger").dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    // Click the United States option.
+    const usOption = document.querySelector('[data-iso2="US"]');
+    usOption.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(document.getElementById("countryTrigger").textContent).toContain(
+      "+1"
+    );
+    expect(document.getElementById("phone").value).toBe("+1 1234567");
+  });
+});
+
+describe("hidden #phone recomputation", () => {
+  it("strips a single leading 0 from the national number", async () => {
+    await setupForm();
+    setField("nationalNumber", "0541234567");
+    expect(document.getElementById("phone").value).toBe("+972 541234567");
+  });
+
+  it("keeps one 0 when the user typed two leading zeros", async () => {
+    await setupForm();
+    setField("nationalNumber", "00541234567");
+    expect(document.getElementById("phone").value).toBe("+972 0541234567");
+  });
+
+  it("reflects a country change with the current national number typed", async () => {
+    await setupForm();
+    setField("nationalNumber", "0541234567");
+    document.getElementById("countryTrigger").dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    document
+      .querySelector('[data-iso2="GB"]')
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(document.getElementById("phone").value).toBe("+44 541234567");
+  });
 });
 
 describe("blur validation", () => {
@@ -75,14 +182,24 @@ describe("blur validation", () => {
     expect(error.textContent).toMatch(/required/i);
   });
 
-  it("shows a field-specific error for letters in phone", async () => {
+  it("shows a field-specific error for letters in the national-number input", async () => {
     await setupForm();
-    setField("phone", "054abc4567");
-    blur("phone");
-    const input = document.getElementById("phone");
+    setField("nationalNumber", "054abc4567");
+    blur("nationalNumber");
+    const input = document.getElementById("nationalNumber");
     const error = document.getElementById("phoneError");
     expect(input.classList.contains("is-invalid")).toBe(true);
     expect(error.textContent.length).toBeGreaterThan(0);
+  });
+
+  it("marks the national input valid when the resulting hidden phone is valid", async () => {
+    await setupForm();
+    setField("nationalNumber", "0541234567");
+    blur("nationalNumber");
+    const input = document.getElementById("nationalNumber");
+    expect(input.classList.contains("is-valid")).toBe(true);
+    expect(input.classList.contains("is-invalid")).toBe(false);
+    expect(document.getElementById("phone").value).toBe("+972 541234567");
   });
 
   it("clears the error and marks valid when a valid value is blurred", async () => {
@@ -149,11 +266,11 @@ describe("submit with valid data", () => {
     await setupForm();
     setField("fullName", VALID_VALUES.fullName);
     setField("email", VALID_VALUES.email);
-    setField("phone", VALID_VALUES.phone);
+    setField("nationalNumber", VALID_NATIONAL);
     setField("message", VALID_VALUES.message);
   }
 
-  it("calls alert with the submitted values", async () => {
+  it("calls alert with the submitted values including the concatenated phone", async () => {
     await fillValid();
     submitForm();
     expect(alertSpy).toHaveBeenCalledTimes(1);
@@ -161,7 +278,7 @@ describe("submit with valid data", () => {
     expect(text).toContain("Submitted Data:");
     expect(text).toContain(`Name: ${VALID_VALUES.fullName}`);
     expect(text).toContain(`Email: ${VALID_VALUES.email}`);
-    expect(text).toContain(`Phone: ${VALID_VALUES.phone}`);
+    expect(text).toContain(`Phone: ${VALID_PHONE_SUBMITTED}`);
     expect(text).toContain(`Message: ${VALID_VALUES.message}`);
   });
 
@@ -177,14 +294,31 @@ describe("submit with valid data", () => {
     submitForm();
     expect(document.getElementById("fullName").value).toBe("");
     expect(document.getElementById("email").value).toBe("");
-    expect(document.getElementById("phone").value).toBe("");
+    expect(document.getElementById("nationalNumber").value).toBe("");
     expect(document.getElementById("message").value).toBe("");
+  });
+
+  it("resets the country picker back to the default (Israel) after submit", async () => {
+    await fillValid();
+    // Switch to a non-default country before submitting.
+    document.getElementById("countryTrigger").dispatchEvent(
+      new MouseEvent("click", { bubbles: true })
+    );
+    document
+      .querySelector('[data-iso2="US"]')
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    // Re-fill the national number that the country-change cleared expectations of.
+    setField("nationalNumber", VALID_NATIONAL);
+    submitForm();
+    const trigger = document.getElementById("countryTrigger");
+    expect(trigger.textContent).toContain("🇮🇱");
+    expect(document.getElementById("phone").value).toBe("+972 ");
   });
 
   it("removes validation border classes and resets aria-invalid after reset", async () => {
     await fillValid();
     submitForm();
-    for (const id of ["fullName", "email", "phone", "message"]) {
+    for (const id of ["fullName", "email", "nationalNumber", "message"]) {
       const el = document.getElementById(id);
       expect(el.classList.contains("is-valid")).toBe(false);
       expect(el.classList.contains("is-invalid")).toBe(false);
@@ -194,18 +328,22 @@ describe("submit with valid data", () => {
 
   it("hides the success message after the 3-second timer", async () => {
     await fillValid();
+    vi.useFakeTimers();
     submitForm();
     const success = document.getElementById("successMessage");
     expect(success.classList.contains("is-visible")).toBe(true);
     vi.advanceTimersByTime(3000);
     expect(success.classList.contains("is-visible")).toBe(false);
+    vi.useRealTimers();
   });
 
   it("does not hide the success message before the 3-second timer fires", async () => {
     await fillValid();
+    vi.useFakeTimers();
     submitForm();
     const success = document.getElementById("successMessage");
     vi.advanceTimersByTime(2999);
     expect(success.classList.contains("is-visible")).toBe(true);
+    vi.useRealTimers();
   });
 });

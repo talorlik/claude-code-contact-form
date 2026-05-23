@@ -14,7 +14,12 @@ import {
   validatePhone,
   validateMessage,
   validateFormData,
+  stripLeadingZero,
 } from "./validation.js";
+import { loadCountries } from "./countries.js";
+import { createCountryPicker } from "./countryPicker.js";
+
+const DEFAULT_COUNTRY_ISO2 = "IL";
 
 const FIELD_NAMES = /** @type {const} */ ([
   "fullName",
@@ -36,6 +41,10 @@ const form = document.getElementById("contactForm");
 const submitButton = form?.querySelector(".submit-button") ?? null;
 const successMessage = document.getElementById("successMessage");
 
+// The visible "phone" field is the national-number input; the hidden #phone
+// carries the concatenated `+<dialCode> <nationalNumber>` value that the
+// form submits. `inputs.phone` therefore points at the visible element so
+// blur listeners and renderFieldState target what the user actually sees.
 const inputs = {
   fullName: /** @type {HTMLInputElement | null} */ (
     document.getElementById("fullName")
@@ -44,12 +53,29 @@ const inputs = {
     document.getElementById("email")
   ),
   phone: /** @type {HTMLInputElement | null} */ (
-    document.getElementById("phone")
+    document.getElementById("nationalNumber")
   ),
   message: /** @type {HTMLTextAreaElement | null} */ (
     document.getElementById("message")
   ),
 };
+
+const hiddenPhoneInput = /** @type {HTMLInputElement | null} */ (
+  document.getElementById("phone")
+);
+const countryTriggerEl = /** @type {HTMLButtonElement | null} */ (
+  document.getElementById("countryTrigger")
+);
+const countryPopoverEl = document.getElementById("countryPopover");
+const countrySearchEl = /** @type {HTMLInputElement | null} */ (
+  document.getElementById("countrySearch")
+);
+const countryListEl = document.getElementById("countryList");
+
+/** @type {import("./countryPicker.js").CountryPickerApi | null} */
+let countryPickerApi = null;
+/** @type {import("./countries.js").Country | null} */
+let selectedCountry = null;
 
 const errorElements = {
   fullName: document.getElementById("fullNameError"),
@@ -61,15 +87,35 @@ const errorElements = {
 /**
  * Reads the current values of every form field from the DOM.
  *
+ * The `phone` value is read from the hidden #phone input, which is kept in
+ * sync with the country picker and national-number input by
+ * `recomputeHiddenPhone()`.
+ *
  * @returns {import("./validation.js").FormData}
  */
 export function getFormData() {
   return {
     fullName: inputs.fullName?.value ?? "",
     email: inputs.email?.value ?? "",
-    phone: inputs.phone?.value ?? "",
+    phone: hiddenPhoneInput?.value ?? "",
     message: inputs.message?.value ?? "",
   };
+}
+
+/**
+ * Recomputes the hidden #phone value from the current country selection and
+ * national-number input. Strips exactly one leading 0 from the national
+ * portion before concatenating.
+ *
+ * @returns {void}
+ */
+export function recomputeHiddenPhone() {
+  if (!hiddenPhoneInput) return;
+  const nat = stripLeadingZero(inputs.phone?.value ?? "");
+  const dial = selectedCountry?.dialCode ?? "";
+  // Always include the space so an empty national number still trips the
+  // regex (which requires `+<code> \d{4,14}`).
+  hiddenPhoneInput.value = `${dial} ${nat}`;
 }
 
 /**
@@ -104,6 +150,10 @@ export function renderFieldState(fieldName, result) {
  * Validates one field by name using its dedicated validator and renders
  * the result.
  *
+ * For phone, validates against the hidden #phone value (the concatenated
+ * `+<dialCode> <nationalNumber>` form) rather than the visible national-
+ * number input, since the validator's regex covers the full format.
+ *
  * @param {string} fieldName
  * @returns {import("./validation.js").ValidationResult}
  */
@@ -113,7 +163,12 @@ export function validateSingleField(fieldName) {
   if (!validator || !input) {
     return { isValid: true, message: "" };
   }
-  const result = validator(input.value);
+  let valueToValidate = input.value;
+  if (fieldName === "phone") {
+    recomputeHiddenPhone();
+    valueToValidate = hiddenPhoneInput?.value ?? "";
+  }
+  const result = validator(valueToValidate);
   renderFieldState(fieldName, result);
   return result;
 }
@@ -124,6 +179,7 @@ export function validateSingleField(fieldName) {
  * @returns {boolean} True when every field is valid.
  */
 export function validateAllFields() {
+  recomputeHiddenPhone();
   const formData = getFormData();
   const results = validateFormData(formData);
   let allValid = true;
@@ -143,6 +199,14 @@ for (const name of FIELD_NAMES) {
     validateSingleField(name);
   });
 }
+
+// Keep the hidden #phone mirror in sync with the visible national-number
+// input on every keystroke. This is not required for validation
+// correctness (validate* paths recompute before reading), but it keeps
+// DevTools and any external observers honest about the submitted value.
+inputs.phone?.addEventListener("input", () => {
+  recomputeHiddenPhone();
+});
 
 const SUCCESS_HIDE_MS = 3000;
 const ORIGINAL_SUBMIT_TEXT = submitButton?.textContent ?? "Submit";
@@ -234,6 +298,15 @@ export function resetFormState() {
       errorEl.textContent = "";
     }
   }
+  // Reset the country picker (if loaded) back to the default and clear the
+  // hidden #phone mirror so the next submission starts from a clean state.
+  if (countryPickerApi) {
+    countryPickerApi.setSelectedByIso2(DEFAULT_COUNTRY_ISO2);
+    // setSelectedByIso2 does not fire onChange, so update selectedCountry +
+    // hidden mirror manually to mirror what onChange would have done.
+    selectedCountry = countryPickerApi.getSelected();
+  }
+  recomputeHiddenPhone();
 }
 
 // Submit handler. Always prevents the default browser navigation, validates
@@ -267,5 +340,78 @@ form?.addEventListener("submit", (event) => {
   }, SUCCESS_HIDE_MS);
 });
 
+/**
+ * Falls back to a plain phone input when the country list cannot load. The
+ * hidden #phone becomes visible, the country trigger + popover are removed,
+ * and the national-number input is hidden. Validation continues to read
+ * #phone, so the only behavior change is that the user types the full
+ * international number themselves (the pre-picker UX).
+ *
+ * @returns {void}
+ */
+function fallbackToPlainPhoneInput() {
+  if (!hiddenPhoneInput || !inputs.phone) return;
+  // Swap the hidden #phone back to a visible tel input.
+  hiddenPhoneInput.type = "tel";
+  hiddenPhoneInput.classList.add("form-input");
+  hiddenPhoneInput.placeholder = "+972541234567";
+  hiddenPhoneInput.setAttribute("autocomplete", "tel");
+  hiddenPhoneInput.setAttribute("aria-describedby", "phoneError");
+  hiddenPhoneInput.setAttribute("aria-invalid", "false");
+  hiddenPhoneInput.required = true;
+  // Hide the picker UI and the national-only input.
+  countryTriggerEl?.setAttribute("hidden", "");
+  countryPopoverEl?.setAttribute("hidden", "");
+  inputs.phone.setAttribute("hidden", "");
+  inputs.phone.removeAttribute("required");
+  // Repoint inputs.phone at the now-visible #phone so blur/render targets
+  // it and the validator runs against its raw value.
+  inputs.phone = hiddenPhoneInput;
+  hiddenPhoneInput.addEventListener("blur", () => {
+    validateSingleField("phone");
+  });
+  // Repoint the label so clicking it focuses the right input. The label
+  // for= still points at "nationalNumber"; rebinding by id avoids touching
+  // the HTML in two places.
+  const label = document.querySelector('label[for="nationalNumber"]');
+  if (label) label.setAttribute("for", "phone");
+}
+
+// Boot: load the country list and create the picker. If the JSON fails to
+// load, fall back to a plain phone input so the form remains usable.
+(async () => {
+  if (!countryTriggerEl || !countryPopoverEl || !countrySearchEl || !countryListEl) {
+    return;
+  }
+  try {
+    const countries = await loadCountries();
+    countryPickerApi = createCountryPicker({
+      triggerEl: countryTriggerEl,
+      popoverEl: countryPopoverEl,
+      searchInputEl: countrySearchEl,
+      listEl: countryListEl,
+      countries,
+      defaultIso2: DEFAULT_COUNTRY_ISO2,
+      onChange: (country) => {
+        selectedCountry = country;
+        recomputeHiddenPhone();
+        validateSingleField("phone");
+      },
+    });
+    selectedCountry = countryPickerApi.getSelected();
+    recomputeHiddenPhone();
+  } catch (err) {
+    console.error("Country picker disabled:", err);
+    fallbackToPlainPhoneInput();
+  }
+})();
+
 // Export DOM-level helpers so integration tests can drive the form by name.
-export { form, submitButton, successMessage, inputs, errorElements };
+export {
+  form,
+  submitButton,
+  successMessage,
+  inputs,
+  errorElements,
+  hiddenPhoneInput,
+};
