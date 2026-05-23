@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Project Type
 
@@ -139,7 +140,7 @@ flow from it.
 
 The README is comprehensive and aimed at the assignment grader; do not
 duplicate its content here. Treat `docs/planning/PRD.md`,
-`TECHNICAL_REQUIREMENTS.md`, and `TASK_BREAKDOWN.md` as the spec when
-behavior is ambiguous - they describe the intended UX (red/green borders,
-3-second success auto-hide, submit-button disabled state, alert on
-success) in detail.
+`docs/planning/TECHNICAL_REQUIREMENTS.md`, and
+`docs/planning/TASK_BREAKDOWN.md` as the spec when behavior is ambiguous -
+they describe the intended UX (red/green borders, submit-button disabled
+state, and submitted-details success popup) in detail.

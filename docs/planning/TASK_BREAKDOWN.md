@@ -28,18 +28,18 @@ each batch. The numbered prompt files are the batch prompts. The
 
 | Batch | Category | Prompt File | Goal | Output |
 | --- | --- | --- | --- | --- |
-| 01 | Foundation | `docs/prompts/01_project_scaffold.md` | Create folders and baseline files. | Project scaffold. |
-| 02 | HTML | `docs/prompts/02_html_structure_seo_accessibility.md` | Build semantic, SEO-aware form structure. | `index.html`. |
-| 03 | CSS | `docs/prompts/03_css_layout_responsive.md` | Build clean responsive styling. | `css/styles.css`. |
-| 04 | Validation Core | `docs/prompts/04_validation_core.md` | Add pure validation functions. | `javascript/validation.js`. |
-| 05 | DOM Integration | `docs/prompts/05_validation_dom_integration.md` | Connect validation to fields and events. | `javascript/main.js`. |
-| 06 | Submit Flow | `docs/prompts/06_submission_success_flow.md` | Add success flow, reset, and timer. | Updated JS/CSS. |
-| 07 | Submitted Data Alert | `docs/prompts/07_test_alert.md` | Add submitted-data alert. | Updated JS. |
-| 08 | Unit Tests | `docs/prompts/08_unit_tests.md` | Test validation functions. | `tests/unit/validation.test.js`. |
-| 09 | Integration Tests | `docs/prompts/09_integration_tests.md` | Test DOM behavior. | `tests/integration/form.integration.test.js`. |
-| 10 | E2E Tests | `docs/prompts/10_e2e_tests.md` | Test browser user flows. | `tests/e2e/contact-form.spec.js`. |
-| 11 | Documentation | `docs/prompts/11_readme_documentation.md` | Create beginner README. | `README.md`. |
-| 12 | Final Review | `docs/prompts/12_final_review.md` | Validate against requirements. | Clean final project. |
+| 01 | Foundation | `docs/prompts/01_PROJECT_SCAFFOLD.md` | Create folders and baseline files. | Project scaffold. |
+| 02 | HTML | `docs/prompts/02_HTML_STRUCTURE_SEO_ACCESSIBILITY.md` | Build semantic, SEO-aware form structure. | `index.html`. |
+| 03 | CSS | `docs/prompts/03_CSS_LAYOUT_RESPONSIVE.md` | Build clean responsive styling. | `css/styles.css`. |
+| 04 | Validation Core | `docs/prompts/04_VALIDATION_CORE.md` | Add pure validation functions. | `javascript/validation.js`. |
+| 05 | DOM Integration | `docs/prompts/05_VALIDATION_DOM_INTEGRATION.md` | Connect validation to fields and events. | `javascript/main.js`. |
+| 06 | Submit Flow | `docs/prompts/06_SUBMISSION_SUCCESS_FLOW.md` | Add success flow, reset, and timer. | Updated JS/CSS. |
+| 07 | Submitted Data Popup | `docs/prompts/07_SUBMITTED_DATA_POPUP.md` | Add submitted-details popup. | Updated HTML, CSS, and JS. |
+| 08 | Unit Tests | `docs/prompts/08_UNIT_TESTS.md` | Test validation functions. | `tests/unit/validation.test.js`. |
+| 09 | Integration Tests | `docs/prompts/09_INTEGRATION_TESTS.md` | Test DOM behavior. | `tests/integration/form.integration.test.js`. |
+| 10 | E2E Tests | `docs/prompts/10_E2E_TESTS.md` | Test browser user flows. | `tests/e2e/contact-form.spec.js`. |
+| 11 | Documentation | `docs/prompts/11_README_DOCUMENTATION.md` | Create beginner README. | `README.md`. |
+| 12 | Final Review | `docs/prompts/12_FINAL_REVIEW.md` | Validate against requirements. | Clean final project. |
 
 ## 3. Batch 01: Project Scaffold
 
@@ -62,7 +62,7 @@ assignment docs, planning docs, prompts, images, and tests.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/01_project_scaffold.md
+docs/prompts/01_PROJECT_SCAFFOLD.md
 ```
 
 ## 4. Batch 02: HTML Structure, SEO, Accessibility
@@ -82,7 +82,7 @@ SEO metadata, and script/style references.
 | B02-T04 | Add contact form fields. | Medium | Full name, email, phone, message, and submit button exist. |
 | B02-T05 | Add placeholders and labels. | Small | Every field has visible label and placeholder. |
 | B02-T06 | Add error containers and ARIA wiring. | Medium | Each field has an error element referenced by `aria-describedby`. |
-| B02-T07 | Add success message container. | Small | Success element exists with `role="status"` or `aria-live="polite"`. |
+| B02-T07 | Add submitted-details popup container. | Small | Popup element exists with `role="dialog"` and `aria-modal="true"`. |
 | B02-T08 | Link CSS and JS files. | Small | CSS loads in head; JS loads at end of body with `type="module"`. |
 
 ### Prompt File
@@ -90,7 +90,7 @@ SEO metadata, and script/style references.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/02_html_structure_seo_accessibility.md
+docs/prompts/02_HTML_STRUCTURE_SEO_ACCESSIBILITY.md
 ```
 
 ## 5. Batch 03: CSS Layout and Responsive Design
@@ -118,14 +118,15 @@ button style, and success animation.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/03_css_layout_responsive.md
+docs/prompts/03_CSS_LAYOUT_RESPONSIVE.md
 ```
 
-## 6. Batch 04: Pure Validation Core
+## 6. Batch 04: Pure Validation and Country Utilities
 
 ### Goal
 
-Implement validation in isolated pure functions before touching the DOM.
+Implement validation and country-data helpers in isolated pure functions
+before touching the DOM.
 
 ### Tasks
 
@@ -135,17 +136,19 @@ Implement validation in isolated pure functions before touching the DOM.
 | B04-T02 | Add regex constants. | Small | Name, email, and phone regex constants exist. |
 | B04-T03 | Implement `validateFullName`. | Medium | Required, length, and regex checks work. |
 | B04-T04 | Implement `validateEmail`. | Small | Required and regex checks work. |
-| B04-T05 | Implement `validatePhone`. | Small | Required, 8-15 character length, and `^\+?[1-9]\d{1,14}$` regex checks work. |
-| B04-T06 | Implement `validateMessage`. | Small | Required and min 10 checks work. |
-| B04-T07 | Implement `validateFormData`. | Medium | Returns validation results for all fields. |
-| B04-T08 | Export functions for tests and DOM integration. | Small | Functions can be imported by tests and main JS. |
+| B04-T05 | Implement `validatePhone`. | Small | Required, 7-17 character length, and `^\+[1-9]\d{0,3} [1-9]\d{3,13}$` regex checks work. |
+| B04-T06 | Implement `stripLeadingZero`. | Small | Removes exactly one leading `0` before phone concatenation. |
+| B04-T07 | Implement `validateMessage`. | Small | Required and min 10 checks work. |
+| B04-T08 | Implement `validateFormData`. | Medium | Returns validation results for all fields. |
+| B04-T09 | Implement `countries.js` loader and search helpers. | Medium | Countries load once, cache, and search by ISO/name/dial code in ranked order. |
+| B04-T10 | Export functions for tests and DOM integration. | Small | Functions can be imported by tests and main JS. |
 
 ### Prompt File
 
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/04_validation_core.md
+docs/prompts/04_VALIDATION_CORE.md
 ```
 
 ## 7. Batch 05: DOM Validation Integration
@@ -158,7 +161,7 @@ Connect the pure validators to form fields and field-level feedback.
 
 | ID | Task | Size | Acceptance Criteria |
 | --- | --- | --- | --- |
-| B05-T01 | Select form, inputs, error elements, success message, and submit button. | Small | DOM references are centralized. |
+| B05-T01 | Select form, inputs, error elements, submitted-details popup, and submit button. | Small | DOM references are centralized. |
 | B05-T02 | Implement `getFormData`. | Small | Reads values from all fields. |
 | B05-T03 | Implement `renderFieldState`. | Medium | Updates error text, classes, and `aria-invalid`. |
 | B05-T04 | Implement `validateSingleField`. | Medium | Validates one field using its validator. |
@@ -171,7 +174,7 @@ Connect the pure validators to form fields and field-level feedback.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/05_validation_dom_integration.md
+docs/prompts/05_VALIDATION_DOM_INTEGRATION.md
 ```
 
 ## 8. Batch 06: Submission Success Flow
@@ -185,11 +188,11 @@ Implement the assignment's complete successful-submission behavior.
 | ID | Task | Size | Acceptance Criteria |
 | --- | --- | --- | --- |
 | B06-T01 | Implement `setSubmittingState`. | Small | Button is disabled and gray while submitting. |
-| B06-T02 | Implement `showSuccessMessage`. | Small | Success message appears in green. |
-| B06-T03 | Implement `hideSuccessMessage`. | Small | Success message can be hidden. |
+| B06-T02 | Implement `showSubmissionPopup`. | Small | Green success popup appears with submitted values. |
+| B06-T03 | Implement `hideSubmissionPopup`. | Small | Success popup can be hidden. |
 | B06-T04 | Implement `resetFormState`. | Medium | Fields clear and validation borders are removed. |
 | B06-T05 | Update submit handler success branch. | Medium | Valid submit triggers disabled state, success, reset, and timer. |
-| B06-T06 | Add 3-second hide timer. | Small | Success message disappears after 3 seconds. |
+| B06-T06 | Add popup close interactions. | Small | Popup closes from the `X` button or outside click. |
 | B06-T07 | Ensure invalid submit does not clear form. | Small | Invalid values remain visible for correction. |
 
 ### Prompt File
@@ -197,30 +200,30 @@ Implement the assignment's complete successful-submission behavior.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/06_submission_success_flow.md
+docs/prompts/06_SUBMISSION_SUCCESS_FLOW.md
 ```
 
-## 9. Batch 07: Submitted Data Alert
+## 9. Batch 07: Submitted Data Popup
 
 ### Goal
 
-Add the assignment-required temporary alert showing the submitted values.
+Add the submitted-details popup showing the submitted values.
 
 ### Tasks
 
 | ID | Task | Size | Acceptance Criteria |
 | --- | --- | --- | --- |
-| B07-T01 | Capture submitted data before form clearing. | Small | Data is preserved for alert. |
-| B07-T02 | Implement `showSubmittedDataAlert`. | Small | Alert includes name, email, phone, and message. |
-| B07-T03 | Wire alert into successful submit branch. | Small | Alert appears only when all fields are valid. |
-| B07-T04 | Verify alert content matches typed values. | Small | Values are not empty or reset before alert. |
+| B07-T01 | Capture submitted data before form clearing. | Small | Data is preserved for the popup. |
+| B07-T02 | Fill popup detail fields. | Small | Popup includes name, email, phone, and message. |
+| B07-T03 | Wire popup into successful submit branch. | Small | Popup appears only when all fields are valid. |
+| B07-T04 | Verify popup content matches typed values. | Small | Values are not empty or reset before the popup renders. |
 
 ### Prompt File
 
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/07_test_alert.md
+docs/prompts/07_SUBMITTED_DATA_POPUP.md
 ```
 
 ## 10. Batch 08: Unit Tests
@@ -246,7 +249,7 @@ Test all pure validation rules.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/08_unit_tests.md
+docs/prompts/08_UNIT_TESTS.md
 ```
 
 ## 11. Batch 09: Integration Tests
@@ -264,15 +267,15 @@ Test validation behavior through the DOM.
 | B09-T03 | Test blur validation for invalid field. | Medium | Error text and invalid class appear. |
 | B09-T04 | Test blur validation for valid field. | Medium | Error clears and valid class appears. |
 | B09-T05 | Test invalid submit. | Medium | Multiple field errors appear and success is hidden. |
-| B09-T06 | Test valid submit with fake timers. | Medium | Success appears, reset happens, success hides after 3 seconds. |
-| B09-T07 | Mock alert. | Small | Alert calls are testable without browser popup. |
+| B09-T06 | Test valid submit with popup details. | Medium | Popup appears with submitted data and reset happens. |
+| B09-T07 | Test popup close paths. | Small | `X` and outside clicks hide the popup. |
 
 ### Prompt File
 
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/09_integration_tests.md
+docs/prompts/09_INTEGRATION_TESTS.md
 ```
 
 ## 12. Batch 10: E2E Tests
@@ -287,10 +290,10 @@ Validate real browser behavior.
 | --- | --- | --- | --- |
 | B10-T01 | Configure Playwright. | Medium | `npm run test:e2e` starts a static server and runs tests. |
 | B10-T02 | Test page load. | Small | `Contact Us` heading is visible. |
-| B10-T03 | Test invalid submission. | Medium | Empty submit shows field errors and no alert. |
+| B10-T03 | Test invalid submission. | Medium | Empty submit shows field errors and no popup. |
 | B10-T04 | Test invalid phone with letters. | Small | Phone-specific error appears. |
 | B10-T05 | Test valid submission. | Medium | Fill valid values and submit. |
-| B10-T06 | Assert alert content. | Medium | Alert includes submitted values. |
+| B10-T06 | Assert popup content. | Medium | Popup includes submitted values. |
 | B10-T07 | Assert reset and success behavior. | Medium | Fields clear, success appears, then disappears. |
 
 ### Prompt File
@@ -298,7 +301,7 @@ Validate real browser behavior.
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/10_e2e_tests.md
+docs/prompts/10_E2E_TESTS.md
 ```
 
 ## 13. Batch 11: README Documentation
@@ -317,14 +320,14 @@ Create beginner-readable documentation that satisfies the assignment.
 | B11-T04 | Add validation rules table. | Small | README lists all field rules. |
 | B11-T05 | Add testing instructions. | Medium | README documents unit, integration, and E2E test commands. |
 | B11-T06 | Add reflection answers. | Medium | README answers assignment reflection questions. |
-| B11-T07 | Add production improvement notes. | Small | README explains alert is only for exercise. |
+| B11-T07 | Add production improvement notes. | Small | README explains the popup is local-only for this exercise. |
 
 ### Prompt File
 
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/11_readme_documentation.md
+docs/prompts/11_README_DOCUMENTATION.md
 ```
 
 ## 14. Batch 12: Final Review and Cleanup
@@ -351,7 +354,7 @@ Run a final verification pass against the PRD, technical spec, and assignment ch
 Use this Claude Code prompt:
 
 ```text
-docs/prompts/12_final_review.md
+docs/prompts/12_FINAL_REVIEW.md
 ```
 
 ## 15. Recommended Command Sequence

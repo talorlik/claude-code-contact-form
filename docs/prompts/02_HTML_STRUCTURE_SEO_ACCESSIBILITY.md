@@ -25,7 +25,15 @@ Requirements:
 7. Add these fields:
    - Full Name: input type="text", id="fullName", name="fullName"
    - Email: input type="email", id="email", name="email"
-   - Phone: input type="tel", id="phone", name="phone"
+   - Phone:
+     - label points to id="nationalNumber"
+     - a .phone-input-group wrapper
+     - button id="countryTrigger" type="button" for the selected country code
+     - visible national-number input type="tel", id="nationalNumber"
+     - hidden submitted input type="hidden", id="phone", name="phone"
+     - popover id="countryPopover" hidden by default
+     - search input id="countrySearch"
+     - options list id="countryList" role="listbox"
    - Message: textarea, id="message", name="message"
 8. Add a Submit button.
 9. Every field must have:
@@ -34,7 +42,14 @@ Requirements:
    - an error container below the field
    - aria-describedby referencing the error container
    - initial aria-invalid="false"
-10. Add a success-message element with id="successMessage", role="status", and aria-live="polite".
+10. Add a submitted-details popup container:
+   - id="submissionPopup"
+   - hidden by default
+   - role="dialog"
+   - aria-modal="true"
+   - aria-labelledby pointing at the popup title
+   - an X close button with id="submissionPopupClose" and accessible label "Close submitted details"
+   - empty detail targets for submitted name, email, phone, and message
 11. Use clear class names that will be easy to style later.
 12. Do not implement JavaScript logic in the HTML.
 13. Do not use inline styles.

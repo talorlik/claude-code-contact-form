@@ -11,31 +11,25 @@ Requirements:
    - add .is-submitting
    - optionally change the button text to "Submitting..."
    - when false, restore the button
-2. Implement showSuccessMessage():
-   - show the success message
-   - add .is-visible
-   - set clear success text
-3. Implement hideSuccessMessage():
-   - hide the success message
-   - remove .is-visible
-4. Implement resetFormState():
+2. Implement resetFormState():
    - clear all fields
    - remove .is-valid and .is-invalid from all fields
    - clear all error messages
    - reset aria-invalid to "false"
-5. Update the submit handler:
+   - reset the country picker to the Israel default
+   - recompute hidden #phone so it becomes "+972 "
+3. Update the submit handler:
    - prevent default
    - validate all fields
    - if invalid, stop
    - if valid, capture the submitted data before resetting
    - set submitting state to true briefly
-   - show success message
+   - leave a placeholder call/comment for the submitted-details popup
    - reset the form
    - set submitting state back to false
-   - hide success message after 3 seconds
-6. Invalid submissions must not clear the form.
-7. Invalid submissions must not show the success message.
-8. Make sure the success message fade-in animation still works.
+4. Invalid submissions must not clear the form.
+5. Invalid submissions must not show the submitted-details popup.
 
-Do not add the alert in this step. That is handled in the next prompt.
+Do not add an alert in this step. The submitted-details popup is handled in the
+next prompt.
 ```

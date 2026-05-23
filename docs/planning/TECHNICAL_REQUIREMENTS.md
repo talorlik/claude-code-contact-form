@@ -7,7 +7,7 @@ contact-form project built with HTML, CSS, and JavaScript.
 
 The application runs entirely in the browser. It performs client-side
 validation, updates the DOM with field-specific feedback, simulates a successful
-submission, shows an alert with submitted data, and resets the form.
+submission, shows a submitted-details popup, and resets the form.
 
 ## 2. Runtime Technology Stack
 
@@ -46,18 +46,18 @@ claude-code-contact-form/
       TECHNICAL_REQUIREMENTS.md
       TASK_BREAKDOWN.md
     prompts/
-      01_project_scaffold.md
-      02_html_structure_seo_accessibility.md
-      03_css_layout_responsive.md
-      04_validation_core.md
-      05_validation_dom_integration.md
-      06_submission_success_flow.md
-      07_test_alert.md
-      08_unit_tests.md
-      09_integration_tests.md
-      10_e2e_tests.md
-      11_readme_documentation.md
-      12_final_review.md
+      01_PROJECT_SCAFFOLD.md
+      02_HTML_STRUCTURE_SEO_ACCESSIBILITY.md
+      03_CSS_LAYOUT_RESPONSIVE.md
+      04_VALIDATION_CORE.md
+      05_VALIDATION_DOM_INTEGRATION.md
+      06_SUBMISSION_SUCCESS_FLOW.md
+      07_SUBMITTED_DATA_POPUP.md
+      08_UNIT_TESTS.md
+      09_INTEGRATION_TESTS.md
+      10_E2E_TESTS.md
+      11_README_DOCUMENTATION.md
+      12_FINAL_REVIEW.md
   images/
   css/
     styles.css
@@ -145,7 +145,7 @@ Required feedback elements:
 | Email error | `emailError` |
 | Phone error | `phoneError` |
 | Message error | `messageError` |
-| Success message | `successMessage` |
+| Submitted-details popup | `submissionPopup` |
 
 ### 5.4 Country Picker
 
@@ -193,8 +193,10 @@ Required CSS classes:
 | `.is-valid` | Green border for valid fields. |
 | `.is-invalid` | Red border for invalid fields. |
 | `.error-message` | Red field-level error text. |
-| `.success-message` | Green success message box. |
-| `.success-message.is-visible` | Visible animated success state. |
+| `.submission-popup` | Fixed green halo overlay for submitted details. |
+| `.submission-popup.is-visible` | Visible animated popup state. |
+| `.submission-popup__card` | White popup card containing the success text and submitted details. |
+| `.submission-popup__close` | `X` close button inside the popup card. |
 | `.submit-button.is-submitting` | Gray disabled submit state. |
 | `.phone-input-group` | Flex wrapper that draws a single rounded border around the country trigger + national input. Tints green/red when the national input is `.is-valid` / `.is-invalid`. |
 | `.country-trigger` | Combobox trigger button (flag, dial code, caret). |
@@ -205,7 +207,7 @@ Required CSS classes:
 
 ### 6.3 Animation
 
-The success message must use a short fade-in animation.
+The submitted-details popup must use a short fade-in animation.
 
 Example:
 
@@ -299,10 +301,9 @@ Recommended typedef:
 | `validateSingleField(fieldName)` | Validate one field on blur. For `phone`, recomputes the hidden mirror first, then validates the concatenated value. |
 | `validateAllFields()` | Validate all fields on submit (recomputes the hidden phone first). |
 | `setSubmittingState(isSubmitting)` | Disable/enable button and toggle gray style. |
-| `showSuccessMessage()` | Show green animated success message. |
-| `hideSuccessMessage()` | Hide success message. |
+| `showSubmissionPopup(formData)` | Show the green animated success popup with submitted values. |
+| `hideSubmissionPopup()` | Hide the submitted-details popup. |
 | `resetFormState()` | Clear inputs and remove validation borders. Resets the country picker to the default (Israel). |
-| `showSubmittedDataAlert(formData)` | Alert submitted data. |
 
 ### 7.6 Country Picker Functions
 
@@ -402,9 +403,9 @@ Worked examples:
 | `0541234567` | Israel (`+972`) | `+972 541234567` | yes |
 | `541234567` | Israel (`+972`) | `+972 541234567` | yes |
 | `541234567` | United States (`+1`) | `+1 541234567` | yes |
-| `00541234567` | Israel (`+972`) | `+972 0541234567` | no — leading `0` in national portion |
-| `123` | United States (`+1`) | `+1 123` | no — national portion too short |
-| (empty) | Israel (`+972`) | `+972 ` | no — national portion missing |
+| `00541234567` | Israel (`+972`) | `+972 0541234567` | no - leading `0` in national portion |
+| `123` | United States (`+1`) | `+1 123` | no - national portion too short |
+| (empty) | Israel (`+972`) | `+972` plus a trailing space | no - national portion missing |
 
 Example invalid concatenated values:
 
@@ -443,7 +444,7 @@ Required sequence:
    - Show error messages.
    - Receive red borders.
    - Set `aria-invalid="true"`.
-   - No success message.
+   - No submitted-details popup.
    - No alert.
    - Form is not cleared.
 5. Valid fields:
@@ -451,23 +452,23 @@ Required sequence:
    - Set `aria-invalid="false"`.
 6. Capture submitted data before clearing.
 7. Disable submit button briefly.
-8. Show alert with submitted data.
-9. Show green success message.
-10. Clear all fields.
-11. Remove green borders.
-12. Re-enable submit button.
-13. Hide success message after 3 seconds.
+8. Show green submitted-details popup with submitted data.
+9. Clear all fields.
+10. Remove green borders.
+11. Re-enable submit button.
+12. Keep popup open until the user clicks the `X` button or the green halo
+    outside the card.
 
-## 10. Alert Format
+## 10. Popup Content
 
-The alert must include the submitted values. The phone line shows the
-concatenated `+<dialCode> <nationalNumber>` form that the picker
+The submitted-details popup must include the submitted values. The phone row
+shows the concatenated `+<dialCode> <nationalNumber>` form that the picker
 assembled (with any leading `0` already stripped).
 
 Example:
 
 ```text
-Submitted Data:
+Message Sent
 
 Name: Taylor Smith
 Email: taylor@example.com
@@ -482,7 +483,7 @@ Message: I would like more information.
 | A11Y-001 | Every input must have a visible label. |
 | A11Y-002 | Error messages must be programmatically associated with fields. |
 | A11Y-003 | `aria-invalid` must reflect current field validity. |
-| A11Y-004 | The success message should use `role="status"` or `aria-live="polite"`. |
+| A11Y-004 | The submitted-details popup should use `role="dialog"` and `aria-modal="true"`. |
 | A11Y-005 | Error text must not rely on color alone. |
 | A11Y-006 | Button disabled state must be visible and semantic. |
 | A11Y-007 | The form must be keyboard usable. |
@@ -557,7 +558,7 @@ Must cover:
 
 - Country picker boots with the default country (Israel) shown in the
   trigger.
-- Hidden `#phone` is seeded with `+972 ` at boot.
+- Hidden `#phone` is seeded with `+972` plus a trailing space at boot.
 - Trigger click opens the popover and focuses the search input.
 - Typing in the search filters the option list.
 - Clicking an option updates the trigger and recomputes `#phone`.
@@ -569,12 +570,14 @@ Must cover:
 - Error message appears below invalid field.
 - Invalid field receives `.is-invalid`.
 - Valid field receives `.is-valid`.
-- Submit with invalid values does not show success.
-- Submit with valid values shows success and the alert includes the
+- Submit with invalid values does not show the submitted-details popup.
+- Submit with valid values shows the submitted-details popup with the
   concatenated phone.
+- Submitted-details popup closes from the `X` button.
+- Submitted-details popup closes when clicking outside the card.
 - Form reset clears fields and returns the country picker to the
   default.
-- Success message hides after timer.
+- Submitted-details popup does not auto-hide after timer.
 
 ### 14.3 E2E Tests
 
@@ -584,11 +587,12 @@ Must cover:
 - Country picker defaults to Israel and seeds the hidden phone.
 - Country picker is searchable by ISO code and by full name.
 - Invalid submission shows errors.
-- Valid submission strips a leading `0` and triggers the alert with the
+- Valid submission strips a leading `0` and shows the popup with the
   concatenated phone (`+972 541234567`).
 - Valid submission clears the form and resets the picker.
+- Submitted-details popup closes from the `X` button.
+- Submitted-details popup closes when clicking outside the card.
 - Changing the country re-runs phone validation.
-- Success message appears and later disappears.
 
 ## 15. Browser Support
 
@@ -606,8 +610,8 @@ No legacy-browser support is required.
 - Do not send data to a server.
 - Do not store submitted data.
 - Do not log personal data to the console.
-- The alert is a visible local-only testing mechanism.
-- In a production system, replace the alert with secure backend submission.
+- The popup is a visible local-only testing mechanism.
+- In a production system, pair the popup with secure backend submission.
 
 ## 17. Git Requirements
 

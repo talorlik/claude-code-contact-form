@@ -20,9 +20,11 @@ Requirements:
    - labels
    - inputs
    - textarea
+   - phone input group
+   - country picker trigger, popover, search input, and option list
    - submit button
    - error messages
-   - success message
+   - submitted-details popup
 6. Add responsive behavior for mobile screens.
 7. Add these validation classes:
    - .is-valid: green border
@@ -31,19 +33,30 @@ Requirements:
    - red text
    - small readable size
    - spacing from field
-9. Add .success-message styling:
-   - green success look
+9. Add country-picker styling:
+   - .phone-input-group draws one shared border around trigger + national input
+   - .country-trigger shows flag, dial code, and caret
+   - .country-popover is positioned below the phone field and hidden by [hidden]
+   - .country-search is a styled search input
+   - .country-list is scrollable
+   - .country-option supports hover, active, and selected states
+10. Add submitted-details popup styling:
+   - .submission-popup fixed overlay
+   - light transparent green halo outside the card
    - hidden by default
-10. Add .success-message.is-visible:
+   - centered white popup card
+   - readable submitted-detail rows
+   - X close button styling
+11. Add .submission-popup.is-visible:
    - visible
    - use a fade-in animation
-11. Add keyframes for the success fade-in animation.
-12. Add disabled/submitting button styling:
+12. Add keyframes for the popup fade-in animation.
+13. Add disabled/submitting button styling:
    - button:disabled
    - .submit-button.is-submitting
    - gray visual state
-13. Keep the design beginner-friendly and not over-engineered.
-14. Do not use external CSS libraries.
+14. Keep the design beginner-friendly and not over-engineered.
+15. Do not use external CSS libraries.
 
 After implementation, list the classes that JavaScript should toggle.
 ```

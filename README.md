@@ -3,7 +3,7 @@
 This project is a beginner-friendly contact form built with HTML, CSS, and
 vanilla JavaScript. It validates user input in the browser, shows clear
 field-level feedback, confirms successful submissions, displays the submitted
-data in a temporary alert, and resets the form after submission.
+data in a custom popup, and resets the form after submission.
 
 The project is based on Assignment 2, "Build a Contact Form With Data
 Validation." The app does not use a backend server, database, or frontend
@@ -40,12 +40,12 @@ Add screenshots to the `images/` folder when the form is implemented:
 - Required-field validation for every input.
 - Field-specific red error messages.
 - Red borders for invalid fields and green borders for valid fields.
-- Green success message with a short fade-in animation.
+- Green submitted-details popup with a short fade-in animation.
 - Submit button disabled briefly while the form is submitting.
-- Alert showing the submitted data for assignment testing.
 - Form clearing after successful submission (the country picker resets
   back to its default).
-- Success message hidden automatically after 3 seconds.
+- Submitted-details popup closes from its `X` button or by clicking the
+  green halo outside the popup.
 
 ## Project Structure
 
@@ -64,9 +64,9 @@ claude-code-contact-form/
       TECHNICAL_REQUIREMENTS.md
     prompts/
       README.md
-      01_project_scaffold.md
+      01_PROJECT_SCAFFOLD.md
       ...
-      12_final_review.md
+      12_FINAL_REVIEW.md
   images/
   css/
     styles.css
@@ -133,7 +133,7 @@ Then open the local URL shown in the terminal.
 > submission, so the submitted value remains `+972 541234567`. Typing
 > two or more leading zeros (`00...`) is left as-is and will fail
 > validation.
-
+>
 > [!NOTE]
 > Country flags are rendered as Unicode regional-indicator emoji. On
 > macOS, iOS, Android, and most Linux distributions these display as
@@ -149,9 +149,9 @@ field and applies a red border. When a field is valid, the form applies a green
 border.
 
 On a valid submission, the app captures the submitted data, briefly disables the
-Submit button, displays an alert with the submitted values, shows a green
-success message, clears the form, removes validation borders, and hides the
-success message after 3 seconds.
+Submit button, displays a green success popup with the submitted values, clears
+the form, removes validation borders, and leaves the popup open until the user
+closes it with the `X` button or by clicking outside the popup card.
 
 ## Testing
 
@@ -194,7 +194,7 @@ its `🇮🇱 +972` default):
 | Phone (national input) | `0541234567` (or `541234567`) |
 | Message | `I would like more information.` |
 
-The submitted-data alert will show `Phone: +972 541234567` — the picker
+The submitted-details popup will show `Phone: +972 541234567` - the picker
 contributes the dial code and the leading `0` is stripped automatically.
 
 Use these values to confirm validation errors:
@@ -240,17 +240,18 @@ tests, and documentation.
 
 **What would you improve if this form were used on a real website?**
 
-For a real website, I would replace the alert with a secure backend submission,
-add spam protection, avoid exposing submitted personal data, add stronger
-server-side validation, and show a real confirmation after the server accepts
-the message.
+For a real website, I would add secure backend submission, add spam protection,
+avoid exposing submitted personal data longer than needed, add stronger
+server-side validation, and show a confirmation after the server accepts the
+message.
 
 ## Production Note
 
-The submitted-data alert is only for this exercise. Real websites usually send
-form data to a backend server over HTTPS, validate it again on the server, and
-store or process it securely. This assignment intentionally keeps everything in
-the browser so the validation behavior is easy to inspect and test.
+The submitted-details popup is only a local browser confirmation for this
+exercise. Real websites usually send form data to a backend server over HTTPS,
+validate it again on the server, and store or process it securely. This
+assignment intentionally keeps everything in the browser so the validation
+behavior is easy to inspect and test.
 
 ## Supporting Documentation
 

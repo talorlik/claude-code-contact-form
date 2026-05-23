@@ -88,13 +88,13 @@ test("country picker is searchable by full name", async ({ page }) => {
   await expect(firstOption).toHaveAttribute("data-iso2", "IL");
 });
 
-test("valid submission strips a leading 0 and alerts the concatenated phone", async ({
+test("valid submission strips a leading 0 and shows the submitted-details popup", async ({
   page,
 }) => {
-  let alertText = "";
+  let alertFired = false;
   page.on("dialog", async (dialog) => {
-    alertText = dialog.message();
-    await dialog.accept();
+    alertFired = true;
+    await dialog.dismiss();
   });
 
   await page.locator("#fullName").fill(VALID.fullName);
@@ -105,11 +105,15 @@ test("valid submission strips a leading 0 and alerts the concatenated phone", as
 
   await page.getByRole("button", { name: "Submit" }).click();
 
-  expect(alertText).toContain("Submitted Data:");
-  expect(alertText).toContain(`Name: ${VALID.fullName}`);
-  expect(alertText).toContain(`Email: ${VALID.email}`);
-  expect(alertText).toContain(`Phone: ${VALID.phoneSubmitted}`);
-  expect(alertText).toContain(`Message: ${VALID.message}`);
+  expect(alertFired).toBe(false);
+
+  const popup = page.locator("#submissionPopup");
+  await expect(popup).toBeVisible();
+  await expect(popup).toContainText("Message Sent");
+  await expect(page.locator("#submittedFullName")).toHaveText(VALID.fullName);
+  await expect(page.locator("#submittedEmail")).toHaveText(VALID.email);
+  await expect(page.locator("#submittedPhone")).toHaveText(VALID.phoneSubmitted);
+  await expect(page.locator("#submittedMessage")).toHaveText(VALID.message);
 
   // Fields cleared, picker reset to IL default.
   await expect(page.locator("#fullName")).toHaveValue("");
@@ -119,12 +123,24 @@ test("valid submission strips a leading 0 and alerts the concatenated phone", as
   await expect(page.locator("#countryTrigger")).toContainText("+972");
   await expect(page.locator("#phone")).toHaveValue("+972 ");
 
-  // Success message visible.
-  const success = page.locator("#successMessage");
-  await expect(success).toHaveClass(/is-visible/);
+  await page.getByRole("button", { name: "Close submitted details" }).click();
+  await expect(popup).toBeHidden();
+});
 
-  // And disappears after the 3-second timer.
-  await expect(success).not.toHaveClass(/is-visible/, { timeout: 5000 });
+test("submitted-details popup closes when clicking outside it", async ({
+  page,
+}) => {
+  await page.locator("#fullName").fill(VALID.fullName);
+  await page.locator("#email").fill(VALID.email);
+  await page.locator("#nationalNumber").fill(VALID.nationalNumber);
+  await page.locator("#message").fill(VALID.message);
+
+  await page.getByRole("button", { name: "Submit" }).click();
+
+  const popup = page.locator("#submissionPopup");
+  await expect(popup).toBeVisible();
+  await popup.click({ position: { x: 8, y: 8 } });
+  await expect(popup).toBeHidden();
 });
 
 test("changing the country re-runs phone validation", async ({ page }) => {

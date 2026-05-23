@@ -40,7 +40,7 @@ async function setupForm() {
 
 const VALID_NATIONAL = "541234567";
 // With default IL (+972) selected and `541234567` typed, the hidden #phone
-// carries the concatenated form that getFormData/the alert use.
+// carries the concatenated form that getFormData/the success popup use.
 const VALID_PHONE_SUBMITTED = "+972 541234567";
 const VALID_VALUES = {
   fullName: "Taylor Smith",
@@ -238,17 +238,12 @@ describe("submit with invalid data", () => {
     expect(document.getElementById("messageError").textContent).not.toBe("");
   });
 
-  it("does not call alert", async () => {
+  it("does not call alert or reveal the submitted-details popup", async () => {
     await setupForm();
     submitForm();
     expect(alertSpy).not.toHaveBeenCalled();
-  });
-
-  it("does not reveal the success message", async () => {
-    await setupForm();
-    submitForm();
-    const success = document.getElementById("successMessage");
-    expect(success.classList.contains("is-visible")).toBe(false);
+    const popup = document.getElementById("submissionPopup");
+    expect(popup.hidden).toBe(true);
   });
 
   it("preserves the user's invalid input so they can correct it", async () => {
@@ -270,23 +265,56 @@ describe("submit with valid data", () => {
     setField("message", VALID_VALUES.message);
   }
 
-  it("calls alert with the submitted values including the concatenated phone", async () => {
+  it("shows the submitted-details popup with the concatenated phone", async () => {
     await fillValid();
     submitForm();
-    expect(alertSpy).toHaveBeenCalledTimes(1);
-    const text = alertSpy.mock.calls[0][0];
-    expect(text).toContain("Submitted Data:");
-    expect(text).toContain(`Name: ${VALID_VALUES.fullName}`);
-    expect(text).toContain(`Email: ${VALID_VALUES.email}`);
-    expect(text).toContain(`Phone: ${VALID_PHONE_SUBMITTED}`);
-    expect(text).toContain(`Message: ${VALID_VALUES.message}`);
+    expect(alertSpy).not.toHaveBeenCalled();
+    const popup = document.getElementById("submissionPopup");
+    expect(popup.hidden).toBe(false);
+    expect(popup.classList.contains("is-visible")).toBe(true);
+    const text = popup.textContent;
+    expect(text).toContain("Message Sent");
+    expect(document.getElementById("submittedFullName").textContent).toBe(
+      VALID_VALUES.fullName
+    );
+    expect(document.getElementById("submittedEmail").textContent).toBe(
+      VALID_VALUES.email
+    );
+    expect(document.getElementById("submittedPhone").textContent).toBe(
+      VALID_PHONE_SUBMITTED
+    );
+    expect(document.getElementById("submittedMessage").textContent).toBe(
+      VALID_VALUES.message
+    );
   });
 
-  it("reveals the success message", async () => {
+  it("closes the submitted-details popup from the X button", async () => {
     await fillValid();
     submitForm();
-    const success = document.getElementById("successMessage");
-    expect(success.classList.contains("is-visible")).toBe(true);
+    const popup = document.getElementById("submissionPopup");
+    document
+      .getElementById("submissionPopupClose")
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(popup.hidden).toBe(true);
+    expect(popup.classList.contains("is-visible")).toBe(false);
+  });
+
+  it("closes the submitted-details popup when clicking outside the card", async () => {
+    await fillValid();
+    submitForm();
+    const popup = document.getElementById("submissionPopup");
+    popup.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(popup.hidden).toBe(true);
+  });
+
+  it("keeps the submitted-details popup open when clicking inside the card", async () => {
+    await fillValid();
+    submitForm();
+    const popup = document.getElementById("submissionPopup");
+    document
+      .querySelector(".submission-popup__card")
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(popup.hidden).toBe(false);
   });
 
   it("clears every field after submit", async () => {
@@ -326,24 +354,14 @@ describe("submit with valid data", () => {
     }
   });
 
-  it("hides the success message after the 3-second timer", async () => {
+  it("does not auto-hide the submitted-details popup after 3 seconds", async () => {
     await fillValid();
     vi.useFakeTimers();
     submitForm();
-    const success = document.getElementById("successMessage");
-    expect(success.classList.contains("is-visible")).toBe(true);
+    const popup = document.getElementById("submissionPopup");
     vi.advanceTimersByTime(3000);
-    expect(success.classList.contains("is-visible")).toBe(false);
-    vi.useRealTimers();
-  });
-
-  it("does not hide the success message before the 3-second timer fires", async () => {
-    await fillValid();
-    vi.useFakeTimers();
-    submitForm();
-    const success = document.getElementById("successMessage");
-    vi.advanceTimersByTime(2999);
-    expect(success.classList.contains("is-visible")).toBe(true);
+    expect(popup.hidden).toBe(false);
+    expect(popup.classList.contains("is-visible")).toBe(true);
     vi.useRealTimers();
   });
 });

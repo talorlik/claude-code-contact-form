@@ -23,7 +23,8 @@ Check these areas:
    - Contact Us heading exists
    - Full Name field exists and is labeled
    - Email field exists and is labeled
-   - Phone field exists and is labeled
+   - Phone country picker, national-number input, and hidden submitted input exist
+   - Country popover search and list elements exist
    - Message field exists and is labeled
    - Submit button exists
    - SEO metadata exists
@@ -35,26 +36,33 @@ Check these areas:
    - red error messages
    - red invalid borders
    - green valid borders
-   - green success message
+   - country picker styling
+   - green submitted-details popup
    - fade-in animation
    - gray disabled button state
 
 4. JavaScript validation:
    - Full Name: required, 2-30 chars, regex /^[a-zA-Zא-ת .-]+$/
    - Email: required, regex /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-   - Phone: required, 8-15 characters, regex /^\+?[1-9]\d{1,14}$/
+   - Phone: required, format +<dialCode> <nationalNumber>, regex /^\+[1-9]\d{0,3} [1-9]\d{3,13}$/
+   - stripLeadingZero removes exactly one leading 0
    - Message: required, at least 10 chars
    - submit validation works
    - blur validation works
+   - hidden #phone mirrors selected country plus visible national number
+   - country picker loads data/countries.json and searches by ISO/name/dial code
 
 5. Success behavior:
-   - valid submit shows success
-   - success fades in
+   - valid submit shows the submitted-details popup
+   - popup fades in
    - button disables briefly
-   - alert displays submitted data
+   - popup displays submitted data
    - form clears
+   - country picker resets to Israel
    - validation borders reset
-   - success hides after 3 seconds
+   - popup closes from the X button
+   - popup closes when clicking outside the popup card
+   - alert is not used
 
 6. Tests:
    - unit tests pass

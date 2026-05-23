@@ -3,7 +3,7 @@
  *
  * Wires the pure validators in `validation.js` to live form fields, renders
  * per-field feedback on blur, and on a valid submit runs the success
- * sequence (alert, success message, reset, 3-second auto-hide).
+ * sequence (submitted-details popup, reset, button-state restoration).
  *
  * @module main
  */
@@ -39,7 +39,17 @@ const FIELD_VALIDATORS = {
 // Centralized DOM references. Looked up once at module load.
 const form = document.getElementById("contactForm");
 const submitButton = form?.querySelector(".submit-button") ?? null;
-const successMessage = document.getElementById("successMessage");
+const submissionPopup = document.getElementById("submissionPopup");
+const submissionPopupClose = /** @type {HTMLButtonElement | null} */ (
+  document.getElementById("submissionPopupClose")
+);
+
+const submittedOutput = {
+  fullName: document.getElementById("submittedFullName"),
+  email: document.getElementById("submittedEmail"),
+  phone: document.getElementById("submittedPhone"),
+  message: document.getElementById("submittedMessage"),
+};
 
 // The visible "phone" field is the national-number input; the hidden #phone
 // carries the concatenated `+<dialCode> <nationalNumber>` value that the
@@ -208,9 +218,7 @@ inputs.phone?.addEventListener("input", () => {
   recomputeHiddenPhone();
 });
 
-const SUCCESS_HIDE_MS = 3000;
 const ORIGINAL_SUBMIT_TEXT = submitButton?.textContent ?? "Submit";
-let successHideTimer = null;
 
 /**
  * Toggles the visual + interactive submitting state on the submit button.
@@ -232,52 +240,54 @@ export function setSubmittingState(isSubmitting) {
 }
 
 /**
- * Reveals the green success message with the CSS fade-in animation.
- *
- * @returns {void}
- */
-export function showSuccessMessage() {
-  if (!successMessage) return;
-  // Re-trigger the fade-in animation if the message was already visible by
-  // toggling the class off and back on.
-  successMessage.classList.remove("is-visible");
-  // Force reflow so the animation restart is observed.
-  void successMessage.offsetWidth;
-  successMessage.classList.add("is-visible");
-}
-
-/**
- * Hides the success message.
- *
- * @returns {void}
- */
-export function hideSuccessMessage() {
-  if (!successMessage) return;
-  successMessage.classList.remove("is-visible");
-}
-
-/**
- * Displays a temporary alert listing every submitted value.
- *
- * This alert exists ONLY because the assignment requires a visible
- * confirmation that the submitted data was captured. A production
- * implementation would replace this with a backend POST (and a proper
- * inline confirmation UI) rather than a blocking browser alert.
+ * Reveals the submitted-details success popup.
  *
  * @param {import("./validation.js").FormData} formData
  * @returns {void}
  */
-export function showSubmittedDataAlert(formData) {
-  const lines = [
-    "Submitted Data:",
-    "",
-    `Name: ${formData.fullName}`,
-    `Email: ${formData.email}`,
-    `Phone: ${formData.phone}`,
-    `Message: ${formData.message}`,
-  ];
-  window.alert(lines.join("\n"));
+export function showSubmissionPopup(formData) {
+  if (
+    !submissionPopup ||
+    !submittedOutput.fullName ||
+    !submittedOutput.email ||
+    !submittedOutput.phone ||
+    !submittedOutput.message
+  ) {
+    return;
+  }
+  submittedOutput.fullName.textContent = formData.fullName;
+  submittedOutput.email.textContent = formData.email;
+  submittedOutput.phone.textContent = formData.phone;
+  submittedOutput.message.textContent = formData.message;
+  submissionPopup.hidden = false;
+  submissionPopup.classList.add("is-visible");
+  submissionPopupClose?.focus();
 }
+
+/**
+ * Hides the submitted-details success popup.
+ *
+ * @returns {void}
+ */
+export function hideSubmissionPopup() {
+  if (!submissionPopup) return;
+  submissionPopup.classList.remove("is-visible");
+  submissionPopup.hidden = true;
+}
+
+submissionPopupClose?.addEventListener("click", hideSubmissionPopup);
+
+submissionPopup?.addEventListener("click", (event) => {
+  if (event.target === submissionPopup) {
+    hideSubmissionPopup();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && submissionPopup?.hidden === false) {
+    hideSubmissionPopup();
+  }
+});
 
 /**
  * Clears the form fields and removes any validation state classes / ARIA
@@ -311,8 +321,8 @@ export function resetFormState() {
 
 // Submit handler. Always prevents the default browser navigation, validates
 // every field, and on success runs the full success flow: capture data,
-// briefly disable the button, alert the submitted values, show success,
-// reset the form, then hide the success message after 3 seconds.
+// briefly disable the button, show the submitted-details popup, reset the form,
+// then restore the button state.
 form?.addEventListener("submit", (event) => {
   event.preventDefault();
   const allValid = validateAllFields();
@@ -322,22 +332,13 @@ form?.addEventListener("submit", (event) => {
   }
 
   // Capture submitted data BEFORE resetFormState clears the inputs so the
-  // alert can echo what the user actually typed.
+  // popup can echo what the user actually typed.
   const submittedData = getFormData();
 
   setSubmittingState(true);
-  showSubmittedDataAlert(submittedData);
-  showSuccessMessage();
+  showSubmissionPopup(submittedData);
   resetFormState();
   setSubmittingState(false);
-
-  if (successHideTimer !== null) {
-    clearTimeout(successHideTimer);
-  }
-  successHideTimer = setTimeout(() => {
-    hideSuccessMessage();
-    successHideTimer = null;
-  }, SUCCESS_HIDE_MS);
 });
 
 /**
@@ -410,7 +411,8 @@ function fallbackToPlainPhoneInput() {
 export {
   form,
   submitButton,
-  successMessage,
+  submissionPopup,
+  submissionPopupClose,
   inputs,
   errorElements,
   hiddenPhoneInput,

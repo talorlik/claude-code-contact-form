@@ -130,12 +130,48 @@
         </form>
 
         <div
-          id="successMessage"
-          class="success-message"
-          role="status"
-          aria-live="polite"
+          id="submissionPopup"
+          class="submission-popup"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="submissionPopupTitle"
+          hidden
         >
-          Thanks! Your message has been received.
+          <div class="submission-popup__card">
+            <button
+              type="button"
+              id="submissionPopupClose"
+              class="submission-popup__close"
+              aria-label="Close submitted details"
+            >
+              X
+            </button>
+
+            <div class="submission-popup__icon" aria-hidden="true">&#10003;</div>
+            <h2 id="submissionPopupTitle">Message Sent</h2>
+            <p class="submission-popup__intro">
+              Thanks! Your message has been received.
+            </p>
+
+            <dl class="submission-popup__details">
+              <div class="submission-popup__row">
+                <dt>Name</dt>
+                <dd id="submittedFullName"></dd>
+              </div>
+              <div class="submission-popup__row">
+                <dt>Email</dt>
+                <dd id="submittedEmail"></dd>
+              </div>
+              <div class="submission-popup__row">
+                <dt>Phone</dt>
+                <dd id="submittedPhone"></dd>
+              </div>
+              <div class="submission-popup__row">
+                <dt>Message</dt>
+                <dd id="submittedMessage"></dd>
+              </div>
+            </dl>
+          </div>
         </div>
       </section>
     </main>

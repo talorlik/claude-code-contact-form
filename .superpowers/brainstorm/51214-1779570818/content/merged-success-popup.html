@@ -1,0 +1,49 @@
+<h2>Refined Direction: Success Popup With Details</h2>
+<p class="subtitle">
+  This replaces both the browser alert and the existing inline success message.
+  The popup becomes the single success confirmation.
+</p>
+
+<div class="mockup">
+  <div class="mockup-header">Preview: submitted form state</div>
+  <div class="mockup-body" style="background:#f3f4f6;padding:28px;">
+    <div style="max-width:430px;margin:0 auto;border-radius:16px;background:#fff;padding:28px;box-shadow:0 4px 16px rgba(15,23,42,.08);">
+      <h3 style="margin:0 0 8px;">Contact Us</h3>
+      <div style="height:38px;border-radius:8px;background:#e5e7eb;margin:14px 0;"></div>
+      <div style="height:38px;border-radius:8px;background:#e5e7eb;margin:14px 0;"></div>
+      <div style="height:38px;border-radius:8px;background:#e5e7eb;margin:14px 0;"></div>
+      <div style="height:78px;border-radius:8px;background:#e5e7eb;margin:14px 0;"></div>
+      <div style="width:95px;height:40px;border-radius:8px;background:#2563eb;"></div>
+    </div>
+
+    <div style="position:relative;max-width:430px;margin:-320px auto 0;padding:24px;">
+      <div style="position:absolute;inset:0;background:rgba(15,23,42,.45);border-radius:18px;"></div>
+      <div style="position:relative;margin:0 auto;max-width:360px;border-radius:18px;background:#fff;box-shadow:0 22px 60px rgba(15,23,42,.28);padding:22px;">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px;">
+          <div>
+            <div style="width:38px;height:38px;border-radius:999px;background:#dcfce7;color:#166534;display:grid;place-items:center;margin-bottom:10px;font-weight:700;">✓</div>
+            <strong style="display:block;font-size:18px;color:#111827;">Message Sent</strong>
+            <p style="margin:4px 0 0;color:#4b5563;font-size:13px;">Thanks! Your message has been received.</p>
+          </div>
+          <button style="border:0;background:transparent;color:#6b7280;font-size:22px;line-height:1;cursor:pointer;">x</button>
+        </div>
+
+        <div style="display:grid;gap:10px;font-size:13px;">
+          <div style="padding:9px 10px;border-radius:10px;background:#f9fafb;"><span style="display:block;color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Name</span>Taylor Smith</div>
+          <div style="padding:9px 10px;border-radius:10px;background:#f9fafb;"><span style="display:block;color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Email</span>taylor@example.com</div>
+          <div style="padding:9px 10px;border-radius:10px;background:#f9fafb;"><span style="display:block;color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Phone</span>+972 541234567</div>
+          <div style="padding:9px 10px;border-radius:10px;background:#f9fafb;"><span style="display:block;color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:.04em;">Message</span>I would like more information.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Behavior</h3>
+  <p>
+    On valid submit, the form captures the submitted values, opens this popup,
+    resets the form, and restores the submit button. The popup closes via the X
+    button or by clicking the dark backdrop outside the card.
+  </p>
+</div>

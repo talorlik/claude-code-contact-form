@@ -22,18 +22,20 @@ Include:
 6. Validation rules table:
    - Full Name: required, 2-30 chars, allowed letters Hebrew/English, spaces, dot, hyphen
    - Email: required, valid email format
-   - Phone: required, 8-15 characters, optional leading +, regex /^\+?[1-9]\d{1,14}$/
+   - Phone: country picker supplies dial code, user types national number, one leading 0 is stripped, submitted format is +<dialCode> <nationalNumber>, regex /^\+[1-9]\d{0,3} [1-9]\d{3,13}$/
    - Message: required, at least 10 characters
 7. UX behavior:
    - red error messages
    - red invalid borders
    - green valid borders
-   - green success message
+   - searchable country-code picker defaulting to Israel (+972)
+   - green submitted-details popup
    - fade-in animation
    - disabled submit button while submitting
    - form clearing
-   - success hides after 3 seconds
-   - alert displays submitted data
+   - popup displays submitted data
+   - popup closes from the X button or outside click
+   - form resets the country picker to Israel after successful submission
 8. Testing:
    - how to run unit tests
    - how to run integration tests
@@ -45,7 +47,7 @@ Include:
    - How did Claude Code help you move from one version to the next?
    - What would you improve if this form were used on a real website?
 11. Production note:
-   - explain that the alert is only for this exercise
+   - explain that the popup is local-only for this exercise
    - real websites usually send form data to a backend server
 
 Keep the README concise but complete.

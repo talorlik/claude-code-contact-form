@@ -1,0 +1,86 @@
+<h2>Choose The Submission Popup Style</h2>
+<p class="subtitle">
+  Each option replaces the blocking browser alert with a custom overlay that can
+  close from the X button or by clicking outside the popup.
+</p>
+
+<div class="cards">
+  <div class="card" data-choice="balanced-modal" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Balanced Modal</div>
+        <div class="mockup-body" style="background:#f3f4f6;padding:18px;">
+          <div style="margin:0 auto;max-width:340px;border-radius:14px;background:#fff;box-shadow:0 18px 45px rgba(15,23,42,.2);padding:18px;">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;">
+              <strong>Submitted Details</strong>
+              <span style="font-size:20px;color:#6b7280;">x</span>
+            </div>
+            <div style="display:grid;gap:8px;font-size:13px;">
+              <div><span style="color:#6b7280;">Name</span><br>Taylor Smith</div>
+              <div><span style="color:#6b7280;">Email</span><br>taylor@example.com</div>
+              <div><span style="color:#6b7280;">Phone</span><br>+972 541234567</div>
+              <div><span style="color:#6b7280;">Message</span><br>I would like more information.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Balanced Modal</h3>
+      <p>Clear title, readable labels, centered overlay. Best fit for this app.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="receipt-popup" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Receipt Popup</div>
+        <div class="mockup-body" style="background:#f3f4f6;padding:18px;">
+          <div style="margin:0 auto;max-width:300px;border-radius:10px;background:#fff;border:1px solid #d1d5db;padding:16px;font-family:ui-monospace,Menlo,monospace;font-size:12px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+              <strong>SUBMITTED</strong>
+              <span>x</span>
+            </div>
+            <div>Name: Taylor Smith</div>
+            <div>Email: taylor@example.com</div>
+            <div>Phone: +972 541234567</div>
+            <div style="margin-top:8px;">Message: I would like more information.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Receipt Popup</h3>
+      <p>Compact and literal, but less friendly and less readable for long text.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="success-card" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Success Card</div>
+        <div class="mockup-body" style="background:#ecfdf5;padding:18px;">
+          <div style="margin:0 auto;max-width:360px;border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(21,128,61,.22);padding:20px;">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+              <div>
+                <div style="width:34px;height:34px;border-radius:999px;background:#dcfce7;color:#166534;display:grid;place-items:center;margin-bottom:8px;">✓</div>
+                <strong>Message Sent</strong>
+                <p style="margin:4px 0 12px;color:#4b5563;font-size:13px;">Here are the details we captured.</p>
+              </div>
+              <span style="font-size:20px;color:#6b7280;">x</span>
+            </div>
+            <div style="display:grid;gap:7px;font-size:13px;">
+              <div><b>Name:</b> Taylor Smith</div>
+              <div><b>Email:</b> taylor@example.com</div>
+              <div><b>Phone:</b> +972 541234567</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Success Card</h3>
+      <p>More celebratory and polished, but overlaps with the existing success message.</p>
+    </div>
+  </div>
+</div>

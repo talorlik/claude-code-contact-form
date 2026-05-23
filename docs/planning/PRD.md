@@ -4,8 +4,8 @@
 
 Build a beginner-friendly, browser-only contact-form project using HTML, CSS,
 and JavaScript. The form must validate user input in the browser, provide clear
-field-level feedback, show a success state after valid submission, display a
-temporary alert with submitted data, clear the form, and include
+field-level feedback, show a success popup after valid submission, display the
+submitted data in that popup, clear the form, and include
 beginner-readable documentation.
 
 ## 2. Source Assignment
@@ -48,12 +48,11 @@ a Contact Form With Data Validation**.
 - Field-specific error messages.
 - Red invalid-field state.
 - Green valid-field state.
-- Green success message.
+- Green submitted-details success popup.
 - Success fade-in animation.
 - Brief disabled submit state.
 - Automatic form reset after successful submission.
-- Success message hidden after 3 seconds.
-- Alert showing submitted data.
+- Popup close behavior through the `X` button and outside click.
 - README documentation.
 - Unit tests for validation logic.
 - Integration tests for DOM behavior.
@@ -78,7 +77,7 @@ a Contact Form With Data Validation**.
 | --- | --- |
 | A-001 | The project runs directly in a browser or through a local static server. |
 | A-002 | All validation is client-side. |
-| A-003 | The submitted-data alert is temporary and exists only for the assignment. |
+| A-003 | The submitted-details popup is local-only and exists for assignment inspection. |
 | A-004 | Phone validation follows the assignment's initial per-field rule from Step 3, including length limits and the declared base regex. |
 | A-005 | Test tooling may use JavaScript dev dependencies, but the application itself remains plain HTML, CSS, and JavaScript. |
 
@@ -106,8 +105,8 @@ a Contact Form With Data Validation**.
 | FR-011 | Email is required. | Empty email displays a field-specific error. |
 | FR-012 | Email must match `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`. | Invalid email values fail. |
 | FR-013 | Phone is required. | Empty phone displays a field-specific error. |
-| FR-014 | Phone length must be 8-15 characters after trimming. | Values shorter than 8 or longer than 15 characters fail. |
-| FR-015 | Phone must match `^\+?[1-9]\d{1,14}$`. | Letters, spaces, unsupported symbols, local numbers starting with `0`, and misplaced `+` fail. |
+| FR-014 | Phone is submitted as `+<dialCode> <nationalNumber>`. | The hidden `#phone` value combines the country picker dial code and the visible national-number input. |
+| FR-015 | Phone must match `^\+[1-9]\d{0,3} [1-9]\d{3,13}$`. | Missing `+`, missing separator, letters, extra spaces, dial code starting with `0`, and national numbers starting with `0` fail. |
 | FR-016 | Message is required. | Empty message displays a field-specific error. |
 | FR-017 | Message must be at least 10 characters after trimming. | Short messages fail. |
 | FR-018 | Validation must run on submit. | Clicking Submit validates all fields. |
@@ -120,13 +119,13 @@ a Contact Form With Data Validation**.
 | FR-020 | Invalid fields must show a red error message below the field. | Each invalid field shows its own error near the field. |
 | FR-021 | Invalid fields must receive a red border. | Invalid fields have visible red border styling. |
 | FR-022 | Valid fields must receive a green border. | Valid fields have visible green border styling. |
-| FR-023 | A green success message must appear after valid submission. | Success message appears only after all fields are valid. |
-| FR-024 | The success message must fade in. | CSS animation or transition is visible. |
+| FR-023 | A green submitted-details popup must appear after valid submission. | Popup appears only after all fields are valid. |
+| FR-024 | The submitted-details popup must fade in. | CSS animation or transition is visible. |
 | FR-025 | The Submit button must become disabled briefly while submitting. | Button is disabled and styled gray during the submit simulation. |
 | FR-026 | The form must clear after successful submission. | All fields return to empty state. |
 | FR-027 | Green borders must be removed after successful clearing. | Fields have neutral borders after reset. |
-| FR-028 | Success message must hide after 3 seconds. | Success message disappears automatically. |
-| FR-029 | An alert must display submitted data. | Alert includes name, email, phone, and message exactly as submitted. |
+| FR-028 | The submitted-details popup must close from the `X` button. | Clicking the `X` hides the popup. |
+| FR-029 | The submitted-details popup must close on outside click. | Clicking the green halo outside the card hides the popup. |
 
 ### 7.4 Documentation
 
@@ -144,7 +143,7 @@ a Contact Form With Data Validation**.
 | --- | --- | --- |
 | FR-035 | Unit tests must cover pure validation logic. | Tests pass for valid and invalid name, email, phone, and message values. |
 | FR-036 | Integration tests must cover DOM validation behavior. | Tests verify error rendering, valid/invalid classes, and submit-state behavior. |
-| FR-037 | E2E tests must cover real browser flows. | Tests validate invalid submission, valid submission, alert content, reset behavior, and success timeout. |
+| FR-037 | E2E tests must cover real browser flows. | Tests validate invalid submission, valid submission, popup content, reset behavior, and popup closing. |
 
 ## 8. Non-Functional Requirements
 
@@ -159,29 +158,25 @@ a Contact Form With Data Validation**.
 | NFR-007 | JavaScript must include proper JSDoc. | Public/helper functions include `@param` and `@returns` where relevant. |
 | NFR-008 | Code must be beginner-readable. | Code uses clear names, small functions, and comments only where helpful. |
 
-## 9. Resolved Requirement Conflict
+## 9. Resolved Phone Requirement
 
-The assignment contains two phone-rule variants:
-
-| Source Area | Phone Rule |
-| --- | --- |
-| Step 3 prompt | Required, min 8, max 15 characters, base regex `^\+?[1-9]\d{1,14}$`. |
-| Final Validation Rules table | Numbers only, 9-10 digits. |
-
-Implementation must follow the **Step 3 initial per-field rule** because the
-user explicitly requested the initially declared rules.
+The assignment started with a plain phone input, but the implementation now
+uses a country picker plus a visible national-number input. The hidden
+submitted value is the normalized `+<dialCode> <nationalNumber>` string.
 
 Final phone rule:
 
 ```text
 Required.
-8-15 characters after trimming.
-Must match /^\+?[1-9]\d{1,14}$/.
+Submitted as +<dialCode> <nationalNumber>.
+7-17 characters after trimming.
+Must match /^\+[1-9]\d{0,3} [1-9]\d{3,13}$/.
+Strip exactly one leading 0 from the visible national-number input before
+concatenating.
 ```
 
-Note: this declared regex rejects local numbers starting with `0`, such as
-`0541234567`. Use an international-style value such as `+972541234567` when
-testing against this rule.
+Example: national input `0541234567` with Israel selected becomes
+`+972 541234567`.
 
 ## 10. Definition of Done
 
@@ -193,11 +188,11 @@ The project is complete when:
 - Errors are field-specific and displayed near the correct fields.
 - Invalid fields receive red borders.
 - Valid fields receive green borders.
-- Success message appears in green and fades in.
+- Submitted-details popup appears in green and fades in.
 - Submit button is briefly disabled and gray.
-- Alert displays submitted data after valid submission.
+- Submitted-details popup displays submitted data after valid submission.
 - Form clears after successful submission.
-- Success message hides after 3 seconds.
+- Submitted-details popup closes from its `X` button or an outside click.
 - README explains usage, validation, and learning.
 - Unit, integration, and E2E tests pass.
 - JavaScript functions have JSDoc.
