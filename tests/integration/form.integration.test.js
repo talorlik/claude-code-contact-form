@@ -87,6 +87,24 @@ afterEach(() => {
   fetchSpy.mockRestore();
 });
 
+describe("required field indicators", () => {
+  it("shows required asterisks on labels and explains them in small print", async () => {
+    await setupForm();
+
+    const intro = document.querySelector(".contact-intro");
+    expect(intro.textContent).not.toMatch(/all fields are required/i);
+
+    const note = document.querySelector(".required-note");
+    expect(note.textContent).toBe("Fields marked with (*) are required.");
+
+    const labels = [...document.querySelectorAll(".form-label")];
+    expect(labels).toHaveLength(4);
+    expect(
+      labels.map((label) => label.querySelector(".required-indicator")?.textContent)
+    ).toEqual(["*", "*", "*", "*"]);
+  });
+});
+
 describe("country picker boot", () => {
   it("paints the default selected country (Israel) into the trigger", async () => {
     await setupForm();

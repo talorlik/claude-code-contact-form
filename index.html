@@ -15,13 +15,17 @@
       <section class="contact-card" aria-labelledby="contactHeading">
         <h1 id="contactHeading">Contact Us</h1>
         <p class="contact-intro">
-          Fill in the form below to get in touch. All fields are required.
-          Your input is validated as you go and never leaves your browser.
+          Fill in the form below to get in touch. Your input is validated as you
+          go and never leaves your browser.
         </p>
+        <p class="required-note">Fields marked with (*) are required.</p>
 
         <form id="contactForm" class="contact-form" novalidate>
           <div class="form-group">
-            <label for="fullName" class="form-label">Full Name</label>
+            <label for="fullName" class="form-label">
+              Full Name
+              <span class="required-indicator" aria-hidden="true">*</span>
+            </label>
             <input
               type="text"
               id="fullName"
@@ -42,7 +46,10 @@
           </div>
 
           <div class="form-group">
-            <label for="email" class="form-label">Email</label>
+            <label for="email" class="form-label">
+              Email
+              <span class="required-indicator" aria-hidden="true">*</span>
+            </label>
             <input
               type="email"
               id="email"
@@ -63,7 +70,10 @@
           </div>
 
           <div class="form-group">
-            <label for="nationalNumber" class="form-label">Phone</label>
+            <label for="nationalNumber" class="form-label">
+              Phone
+              <span class="required-indicator" aria-hidden="true">*</span>
+            </label>
             <div class="phone-input-group">
               <button
                 type="button"
@@ -107,7 +117,10 @@
           </div>
 
           <div class="form-group">
-            <label for="message" class="form-label">Message</label>
+            <label for="message" class="form-label">
+              Message
+              <span class="required-indicator" aria-hidden="true">*</span>
+            </label>
             <textarea
               id="message"
               name="message"
