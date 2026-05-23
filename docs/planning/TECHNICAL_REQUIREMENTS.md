@@ -331,7 +331,7 @@ Example invalid values:
 
 - Empty string.
 - `1234567`.
-- `+97254123456789`.
+- `+9725412345678901` because it exceeds the 15-character maximum length.
 - `054abc4567`.
 - `0541234567` because the declared regex does not allow a leading `0`.
 - `972 541 234567`.

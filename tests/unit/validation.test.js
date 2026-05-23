@@ -151,7 +151,7 @@ describe("validatePhone", () => {
   });
 
   it("rejects values longer than 15 characters", () => {
-    expect(validatePhone("+97254123456789").isValid).toBe(false);
+    expect(validatePhone("+9725412345678901").isValid).toBe(false);
   });
 });
 
