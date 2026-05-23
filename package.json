@@ -1,0 +1,19 @@
+{
+  "name": "claude-code-contact-form",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Beginner-friendly contact form with client-side validation built with HTML, CSS, and vanilla JavaScript.",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "serve": "npx --yes serve -l 4173 ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "jsdom": "^25.0.1",
+    "vitest": "^2.1.8"
+  }
+}
