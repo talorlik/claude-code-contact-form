@@ -193,6 +193,29 @@ export function hideSuccessMessage() {
 }
 
 /**
+ * Displays a temporary alert listing every submitted value.
+ *
+ * This alert exists ONLY because the assignment requires a visible
+ * confirmation that the submitted data was captured. A production
+ * implementation would replace this with a backend POST (and a proper
+ * inline confirmation UI) rather than a blocking browser alert.
+ *
+ * @param {import("./validation.js").FormData} formData
+ * @returns {void}
+ */
+export function showSubmittedDataAlert(formData) {
+  const lines = [
+    "Submitted Data:",
+    "",
+    `Name: ${formData.fullName}`,
+    `Email: ${formData.email}`,
+    `Phone: ${formData.phone}`,
+    `Message: ${formData.message}`,
+  ];
+  window.alert(lines.join("\n"));
+}
+
+/**
  * Clears the form fields and removes any validation state classes / ARIA
  * flags / error text. Used after a successful submission.
  *
@@ -225,12 +248,12 @@ form?.addEventListener("submit", (event) => {
     return;
   }
 
-  // Capture submitted data BEFORE resetFormState clears the inputs. Batch 07
-  // uses this for the alert.
-  /* eslint-disable-next-line no-unused-vars */
+  // Capture submitted data BEFORE resetFormState clears the inputs so the
+  // alert can echo what the user actually typed.
   const submittedData = getFormData();
 
   setSubmittingState(true);
+  showSubmittedDataAlert(submittedData);
   showSuccessMessage();
   resetFormState();
   setSubmittingState(false);
