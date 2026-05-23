@@ -144,10 +144,79 @@ for (const name of FIELD_NAMES) {
   });
 }
 
-// Submit handler. Always prevents the default browser navigation. The
-// success branch is a placeholder here; Batch 06 implements the full
-// success flow (submitting state, reset, success message timer) and Batch
-// 07 adds the alert.
+const SUCCESS_HIDE_MS = 3000;
+const ORIGINAL_SUBMIT_TEXT = submitButton?.textContent ?? "Submit";
+let successHideTimer = null;
+
+/**
+ * Toggles the visual + interactive submitting state on the submit button.
+ *
+ * @param {boolean} isSubmitting
+ * @returns {void}
+ */
+export function setSubmittingState(isSubmitting) {
+  if (!submitButton) return;
+  if (isSubmitting) {
+    submitButton.disabled = true;
+    submitButton.classList.add("is-submitting");
+    submitButton.textContent = "Submitting...";
+  } else {
+    submitButton.disabled = false;
+    submitButton.classList.remove("is-submitting");
+    submitButton.textContent = ORIGINAL_SUBMIT_TEXT;
+  }
+}
+
+/**
+ * Reveals the green success message with the CSS fade-in animation.
+ *
+ * @returns {void}
+ */
+export function showSuccessMessage() {
+  if (!successMessage) return;
+  // Re-trigger the fade-in animation if the message was already visible by
+  // toggling the class off and back on.
+  successMessage.classList.remove("is-visible");
+  // Force reflow so the animation restart is observed.
+  void successMessage.offsetWidth;
+  successMessage.classList.add("is-visible");
+}
+
+/**
+ * Hides the success message.
+ *
+ * @returns {void}
+ */
+export function hideSuccessMessage() {
+  if (!successMessage) return;
+  successMessage.classList.remove("is-visible");
+}
+
+/**
+ * Clears the form fields and removes any validation state classes / ARIA
+ * flags / error text. Used after a successful submission.
+ *
+ * @returns {void}
+ */
+export function resetFormState() {
+  for (const name of FIELD_NAMES) {
+    const input = inputs[name];
+    const errorEl = errorElements[name];
+    if (input) {
+      input.value = "";
+      input.classList.remove("is-valid", "is-invalid");
+      input.setAttribute("aria-invalid", "false");
+    }
+    if (errorEl) {
+      errorEl.textContent = "";
+    }
+  }
+}
+
+// Submit handler. Always prevents the default browser navigation, validates
+// every field, and on success runs the full success flow: capture data,
+// briefly disable the button, show success, reset the form, then hide the
+// success message after 3 seconds. The alert call is added in Batch 07.
 form?.addEventListener("submit", (event) => {
   event.preventDefault();
   const allValid = validateAllFields();
@@ -155,8 +224,24 @@ form?.addEventListener("submit", (event) => {
     // Leave invalid values visible so the user can correct them.
     return;
   }
-  // TODO(Batch 06): trigger setSubmittingState, showSuccessMessage,
-  // resetFormState, and the 3-second hide timer here.
+
+  // Capture submitted data BEFORE resetFormState clears the inputs. Batch 07
+  // uses this for the alert.
+  /* eslint-disable-next-line no-unused-vars */
+  const submittedData = getFormData();
+
+  setSubmittingState(true);
+  showSuccessMessage();
+  resetFormState();
+  setSubmittingState(false);
+
+  if (successHideTimer !== null) {
+    clearTimeout(successHideTimer);
+  }
+  successHideTimer = setTimeout(() => {
+    hideSuccessMessage();
+    successHideTimer = null;
+  }, SUCCESS_HIDE_MS);
 });
 
 // Export DOM-level helpers so integration tests can drive the form by name.
