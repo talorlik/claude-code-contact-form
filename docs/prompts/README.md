@@ -1,6 +1,7 @@
 # Claude Code Prompts
 
-This directory contains ordered prompts for generating the contact-form assignment with Claude Code.
+This directory contains ordered prompts for generating the contact-form assignment
+with Claude Code.
 
 Use them in numeric order:
 
