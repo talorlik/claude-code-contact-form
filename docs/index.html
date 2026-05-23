@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Claude Code Contact Form | Project Showcase</title>
+    <meta
+      name="description"
+      content="A browser-only contact form project built with HTML, CSS, and vanilla JavaScript, including validation, a country-code picker, documentation, and automated tests."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Tal Orlik" />
+    <meta name="theme-color" content="#0b0e14" />
+    <link
+      rel="canonical"
+      href="https://talorlik.github.io/claude-code-contact-form/"
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Claude Code Contact Form" />
+    <meta property="og:title" content="Claude Code Contact Form | Project Showcase" />
+    <meta
+      property="og:description"
+      content="A static contact-form assignment with field validation, country-code selection, accessible feedback, documentation, and automated tests."
+    />
+    <meta
+      property="og:url"
+      content="https://talorlik.github.io/claude-code-contact-form/"
+    />
+    <meta
+      property="og:image"
+      content="https://talorlik.github.io/claude-code-contact-form/header_banner.png"
+    />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="576" />
+    <meta
+      property="og:image:alt"
+      content="Claude Code Contact Form project banner"
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Claude Code Contact Form" />
+    <meta
+      name="twitter:description"
+      content="A browser-only contact-form project with validation, docs, and tests."
+    />
+    <meta
+      name="twitter:image"
+      content="https://talorlik.github.io/claude-code-contact-form/header_banner.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Claude Code Contact Form project banner"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header" aria-label="Page controls">
+      <a class="brand-link" href="#overview">Contact Form Project</a>
+      <button
+        id="themeToggle"
+        class="theme-toggle"
+        type="button"
+        aria-label="Switch to light theme"
+        aria-pressed="false"
+      >
+        <span class="theme-toggle__icon" aria-hidden="true">L</span>
+        <span class="theme-toggle__text">Theme</span>
+      </button>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-content">
+          <p class="eyebrow">Project Showcase</p>
+          <h1 id="hero-heading">Claude Code Contact Form</h1>
+          <p class="tagline">
+            Browser-only validation &middot; vanilla JavaScript &middot;
+            automated tests
+          </p>
+          <img
+            class="hero-banner"
+            src="./header_banner.png"
+            width="1024"
+            height="576"
+            alt="Claude Code Contact Form project banner"
+            decoding="async"
+            fetchpriority="high"
+          />
+          <div class="hero-actions" aria-label="Primary links">
+            <a
+              class="button button--primary"
+              href="https://github.com/talorlik/claude-code-contact-form"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              View Repository
+            </a>
+            <a
+              class="button"
+              href="https://github.com/talorlik/claude-code-contact-form/blob/main/README.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Read README
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div class="wrap">
+        <section id="overview" aria-labelledby="overview-heading">
+          <h2 id="overview-heading">Overview</h2>
+          <div class="lead-card">
+            <p>
+              This project implements Assignment 2, "Build a Contact Form With
+              Data Validation." It is a static, browser-only contact form built
+              with plain HTML, CSS, and JavaScript. There is no backend, no
+              bundler, and no framework.
+            </p>
+            <p>
+              The production app lives at the repository root. This GitHub Page
+              is the project showcase and documentation hub: it explains what
+              was built, how validation works, which tests cover the behavior,
+              and where the supporting docs live.
+            </p>
+          </div>
+        </section>
+
+        <section aria-labelledby="features-heading">
+          <h2 id="features-heading">Project Highlights</h2>
+          <div class="card-grid">
+            <article class="card">
+              <h3>Client-Side Validation</h3>
+              <p>
+                Full name, email, phone, and message fields are validated in the
+                browser with clear, field-specific feedback.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Country-Code Picker</h3>
+              <p>
+                The phone field combines a searchable country picker with a
+                national-number input and hidden submitted value.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Accessible Feedback</h3>
+              <p>
+                Labels, `aria-describedby`, `aria-invalid`, live regions, and
+                keyboard-friendly controls keep the form usable.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Success Flow</h3>
+              <p>
+                A valid submit captures the data, shows an assignment-required
+                alert, resets the form, and hides success feedback after 3
+                seconds.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Static Runtime</h3>
+              <p>
+                Runtime code is only static HTML, CSS, and ES modules loaded
+                directly by the browser.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Documented Build Process</h3>
+              <p>
+                Planning docs and prompt history describe how the assignment was
+                broken into implementation batches.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section aria-labelledby="architecture-heading">
+          <h2 id="architecture-heading">Architecture</h2>
+          <div class="split-layout">
+            <article class="card">
+              <h3>Pure Modules</h3>
+              <p>
+                <code>javascript/validation.js</code> and
+                <code>javascript/countries.js</code> avoid DOM access, so they
+                can be tested quickly in a Node environment.
+              </p>
+            </article>
+            <article class="card">
+              <h3>DOM Modules</h3>
+              <p>
+                <code>javascript/main.js</code> and
+                <code>javascript/countryPicker.js</code> own DOM wiring, live
+                field feedback, submission behavior, and picker UI.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section aria-labelledby="tests-heading">
+          <h2 id="tests-heading">Tests</h2>
+          <p class="note note--flush">
+            The app has layered coverage so the validation rules, DOM behavior,
+            and browser workflow can be checked independently.
+          </p>
+          <div class="command-grid">
+            <article class="command-card">
+              <h3>All Unit + Integration Tests</h3>
+              <code>npm run test</code>
+              <p>Runs pure validation tests and jsdom integration tests.</p>
+            </article>
+            <article class="command-card">
+              <h3>Unit Tests</h3>
+              <code>npm run test:unit</code>
+              <p>Checks validators, country loading, search, and static docs.</p>
+            </article>
+            <article class="command-card">
+              <h3>Integration Tests</h3>
+              <code>npm run test:integration</code>
+              <p>Loads the form in jsdom and verifies DOM feedback behavior.</p>
+            </article>
+            <article class="command-card">
+              <h3>End-to-End Tests</h3>
+              <code>npm run test:e2e</code>
+              <p>Runs Playwright against a real browser and local static server.</p>
+            </article>
+          </div>
+        </section>
+
+        <section aria-labelledby="docs-heading">
+          <h2 id="docs-heading">Documentation Hub</h2>
+          <div class="link-grid">
+            <a
+              class="link-card"
+              href="https://github.com/talorlik/claude-code-contact-form/blob/main/README.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span>README</span>
+              <small>Usage, validation rules, screenshots, and reflection notes.</small>
+            </a>
+            <a
+              class="link-card"
+              href="https://github.com/talorlik/claude-code-contact-form/blob/main/docs/assignment/ASSIGNMENT.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span>Assignment Brief</span>
+              <small>Original requirements for the contact-form exercise.</small>
+            </a>
+            <a
+              class="link-card"
+              href="https://github.com/talorlik/claude-code-contact-form/blob/main/docs/planning/PRD.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span>Product Requirements</span>
+              <small>Project goals, scope, functional requirements, and DoD.</small>
+            </a>
+            <a
+              class="link-card"
+              href="https://github.com/talorlik/claude-code-contact-form/blob/main/docs/planning/TECHNICAL_REQUIREMENTS.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span>Technical Requirements</span>
+              <small>Implementation constraints and browser behavior details.</small>
+            </a>
+            <a
+              class="link-card"
+              href="https://github.com/talorlik/claude-code-contact-form/blob/main/docs/planning/TASK_BREAKDOWN.md"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span>Task Breakdown</span>
+              <small>Incremental build plan used to create the project.</small>
+            </a>
+            <a
+              class="link-card"
+              href="https://github.com/talorlik/claude-code-contact-form/tree/main/docs/prompts"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <span>Prompt History</span>
+              <small>Claude Code prompts used for each implementation batch.</small>
+            </a>
+          </div>
+        </section>
+
+        <section aria-labelledby="run-heading">
+          <h2 id="run-heading">Run Locally</h2>
+          <div class="lead-card">
+            <p>
+              The root form can be opened directly in a browser. For the country
+              picker data fetch path and Playwright checks, use a local static
+              server from the repository root:
+            </p>
+            <pre><code>npm install
+npm run serve</code></pre>
+            <p>
+              Then open <code>http://localhost:4173</code>. For code review,
+              start with
+              <a
+                href="https://github.com/talorlik/claude-code-contact-form/blob/main/index.html"
+                rel="noopener noreferrer"
+                target="_blank"
+              >the root app source</a>.
+            </p>
+          </div>
+        </section>
+
+        <footer>
+          <p>
+            Built as a static project showcase for the Claude Code Contact Form
+            assignment.
+          </p>
+        </footer>
+      </div>
+    </main>
+  </body>
+</html>
