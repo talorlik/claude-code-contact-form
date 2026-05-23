@@ -2,8 +2,8 @@
  * Browser entry point for the contact form.
  *
  * Wires the pure validators in `validation.js` to live form fields, renders
- * per-field feedback, and handles the submit lifecycle (validate ->
- * preventDefault -> success branch implemented in Batch 06).
+ * per-field feedback on blur, and on a valid submit runs the success
+ * sequence (alert, success message, reset, 3-second auto-hide).
  *
  * @module main
  */
@@ -238,8 +238,8 @@ export function resetFormState() {
 
 // Submit handler. Always prevents the default browser navigation, validates
 // every field, and on success runs the full success flow: capture data,
-// briefly disable the button, show success, reset the form, then hide the
-// success message after 3 seconds. The alert call is added in Batch 07.
+// briefly disable the button, alert the submitted values, show success,
+// reset the form, then hide the success message after 3 seconds.
 form?.addEventListener("submit", (event) => {
   event.preventDefault();
   const allValid = validateAllFields();
